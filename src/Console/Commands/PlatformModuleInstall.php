@@ -45,17 +45,15 @@ class PlatformModuleInstall extends Command
         $moduleSeeder = $module->namespace . $module->name . '\\Seeders\\' . $module->name;
 
         if (class_exists($moduleBaseSeeder = $moduleSeeder . 'BaseSeeder')) {
-            // with(new $moduleBaseSeeder())->run();
             $this->call('module:seed', [
-                'class' => $moduleBaseSeeder,
+                'class' => $module->name . 'BaseSeeder',
                 '--module' => $module->name
             ]);
         }
 
         if (class_exists($moduleUserSeeder = $moduleSeeder . 'UserSeeder')) {
-            // with(new $moduleUserSeeder())->run();
             $this->call('module:seed', [
-                'class' => $moduleUserSeeder,
+                'class' => $module->name . 'UserSeeder',
                 '--module' => $module->name
             ]);
         }
