@@ -218,7 +218,12 @@
             elevation="1"
             rounded="lg"
         >
-            <slot :combos="combos" :record="record" :theme="theme"></slot>
+            <slot
+                :combos="combos"
+                :record="record"
+                :theme="theme"
+                :store="store"
+            ></slot>
         </v-sheet>
 
         <div class="py-2"></div>
@@ -230,7 +235,12 @@
         </template>
 
         <template v-slot:helpdesk>
-            <slot name="helpdesk" :record="record" :theme="theme"></slot>
+            <slot
+                name="helpdesk"
+                :record="record"
+                :theme="theme"
+                :store="store"
+            ></slot>
         </template>
     </form-help>
 </template>
@@ -305,6 +315,8 @@ export default {
             postFormDelete,
             postFormForceDelete,
             postFormRestore,
+
+            store,
         };
     },
 

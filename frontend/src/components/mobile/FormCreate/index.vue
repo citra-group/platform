@@ -95,7 +95,12 @@
             min-height="200px"
             rounded="lg"
         >
-            <slot :combos="combos" :record="record" :theme="theme"></slot>
+            <slot
+                :combos="combos"
+                :record="record"
+                :theme="theme"
+                :store="store"
+            ></slot>
         </v-sheet>
 
         <div class="py-2"></div>
@@ -153,6 +158,8 @@ export default {
             getCreateData,
             openFormData,
             postFormCreate,
+
+            store,
         };
     },
 
