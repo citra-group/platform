@@ -4,6 +4,7 @@ namespace CitraGroup\Platform\Services;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use CitraGroup\Platform\Services\GitModule;
 
 class GitModuleHelper
 {
@@ -22,9 +23,9 @@ class GitModuleHelper
      *
      * @return string
      */
-    public static function buildModuleDir($module_slug): string
+    public static function buildModuleDir($module_name): string
     {
-        return self::baseModuleDir() . DIRECTORY_SEPARATOR . $module_slug;
+        return self::baseModuleDir() . DIRECTORY_SEPARATOR . $module_name;
     }
 
     /**
@@ -46,11 +47,11 @@ class GitModuleHelper
      *
      * @return bool
      */
-    public static function isModuleExist($module_slug): bool
+    public static function isModuleExist($module_name): bool
     {
         // prevent return true because '' should be invalid
-        if ($module_slug == '' || $module_slug == '.' || $module_slug == '..') return false;
-        return is_dir(self::buildModuleDir($module_slug));
+        if ($module_name == '' || $module_name == '.' || $module_name == '..') return false;
+        return is_dir(self::buildModuleDir($module_name));
     }
 
     /**
@@ -109,10 +110,73 @@ class GitModuleHelper
      *
      * @return array | null
      */
-    public function formatModuleTags($raw_tags): array | null
+    public static function formatModuleTags($raw_tags): array | null
     {
         preg_match_all('/.+/', $raw_tags, $tags);
         return count($tags) > 0 ? $tags[0] : [];
     }
+
+    /**
+     *
+     * filterModuleRefsAsTag function
+     *
+     * @return array
+     */
+    public static function filterModuleRefsAsTag($refs, $remote, $branch): array
+    {
+        $result = [];
+        foreach ($refs as $ref) {
+            // boolean
+            $isNotRemote = !str_contains($ref, $remote) && !str_contains($ref, $branch);
+            $isNotHead = !str_contains($ref, 'HEAD') && !str_contains($ref, 'head');
+            // determine if used remote and branch
+            $isUsedRemote = !is_null($remote) && !is_null($branch);
+            $isValidTags = $isNotHead && $isNotRemote && $isUsedRemote || $isNotHead && !$isUsedRemote;
+            // determine condition
+            if ($isValidTags) array_push($result, $ref);
+        }
+        return $result;
+    }
+
+    /**
+     *
+     * formatModuleLogsToJson function
+     *
+     * @return array
+     */
+    public static function formatModuleLogsToJson($logs_string, $module_name): array
+    {
+        // get all the logs
+        $logs = explode('[EXPLODE]', $logs_string);
+        $result = [];
+
+        // filter remotes refs
+        $refs = GitModule::getModuleRemoteAndBranch($module_name);
+        $remote = $refs[0];
+        $branch = $refs[1];
+
+        // formatting all the log as a json object
+        foreach ($logs as $log) {
+            // don't know why but \n cause json_decode
+            // return null don't know if it works in unix
+            $log = trim($log);
+            $log = preg_replace('/\n+/', '\r\n', $log);
+
+            // convert it to json object
+            $json   = json_decode($log, true);
+            $object = json_decode(json_encode($json), false);
+
+            // if successfully converted into object then
+            // append to the array
+            if (!is_null($object)) {
+                $object->refs = explode("|", $object->refs);
+                $object->tags = self::filterModuleRefsAsTag($object->refs, $remote, $branch);
+                array_push($result, $object);
+            }
+        }
+        return $result;
+    }
+
+
 
 }

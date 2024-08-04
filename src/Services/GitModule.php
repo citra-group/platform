@@ -24,7 +24,6 @@ class GitModule
 
     /**
      * process function
-     *$this-o
      * @return string | null
      */
     protected static function process($command, $pwd = null): string | null
@@ -49,7 +48,7 @@ class GitModule
     public static function checkoutModule($ref, $module_name): bool | null
     {
         $command = ['git', 'checkout', $ref];
-        $pwd     = GitModuleHelper::buildModuleDir('');
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
         $output  = self::process($command, $pwd);
         return $output == '';
     }
@@ -86,6 +85,89 @@ class GitModule
     }
 
     /**
+     * deleteModule function
+     *
+     * @return bool | null
+     */
+    public static function deleteModule($module_name): bool | null
+    {
+        // guard clause
+        $pwd = GitModuleHelper::buildModuleDir($module_name);
+
+        // if already non exist
+        if (!file_exists($pwd)) return true;
+
+        // guard clause to prevent any input error that
+        // can remove unwanted directories
+        $isModuleNameDots            = $module_name == '' || $module_name == '*' || $module_name == '.' || $module_name == '..';
+        $isModuleDirPartOfBaseModule = GitModuleHelper::isDirInBaseModule($pwd);
+        if ($isModuleNameDots || !$isModuleDirPartOfBaseModule) {
+            throw new InvalidArgumentException(
+                "There's some security issue with your targeted directory.. \n" .
+                    "Module Name        : $module_name \n" .
+                    "Targeted Directory : $pwd \n"
+            );
+        }
+
+        // confirm for the last time, with the provided information
+        // which folder that want to be deleted
+        self::removeDirectories($pwd);
+        return !file_exists($pwd);
+    }
+
+    /**
+     * deleteModuleByRepo function
+     *
+     * @return bool | null
+     */
+    public static function deleteModuleByRepo($repo_url): bool | null
+    {
+        return GitModule::deleteModule(GitModuleHelper::buildModuleSlug(($repo_url)));
+    }
+
+    /**
+     * Logs Operation
+     * commit
+     * tags
+     * refs
+     * branches
+     * remote
+     */
+
+    /**
+     *
+     * getModuleGitBranchs function
+     *
+     * @return array | null
+     */
+    public static function getModuleGitBranchs($module_name, $remote = null, $head = null): array | null
+    {
+
+    }
+
+    /**
+     *
+     * getModuleGitLog function
+     *
+     * @return array | ProcessFailedException | null
+     */
+    public static function getModuleGitLog($module_name, $remote = null, $head = null): array | null
+    {
+        // git log commit with pretty format
+        // git log --pretty=format:'{ commit:%H, refs:%(decorate:prefix=\",suffix=\",separator=|,tag=), unix_time:%ct }'
+        $remote_head_exist = !is_null($remote) && !is_null($head);
+        if ($remote_head_exist) $command = ['git', 'log', $remote, $head, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
+        else                    $command = ['git', 'log', "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
+
+        // proceed to get the output
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+
+        // return logs
+        return GitModuleHelper::formatModuleLogsToJson($output, $module_name);
+    }
+
+    /**
      *
      * getModuleCommits function
      *
@@ -104,16 +186,24 @@ class GitModule
         return $commits;
     }
 
-    /**
+   /**
      *
-     * getModuleCurrentCommit function
+     * getModuleGitLogByTag function
      *
-     * @return string | null
+     * @return array | null
      */
-    public static function getModuleCurrentCommit($module_name, $remote = null, $head = null): string | null
+    public static function getModuleGitLogByTag($module_name, $remote = null, $head = null): array | null
     {
-        $commits = self::getModuleCommits($module_name, $remote, $head);
-        return !is_array($commits) ? $commits : $commits[0];
+        // git log commit with pretty format
+        // git log --pretty=format:'{ commit:%H, refs:%(decorate:prefix=\",suffix=\",separator=|,tag=), unix_time:%ct }'
+        $remote_head_exist = !is_null($remote) && !is_null($head);
+        if ($remote_head_exist) $command = ['git', 'log', '--no-walk', '--tags', $remote, $head, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
+        else                    $command = ['git', 'log', '--no-walk', '--tags', "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
+        // proceed to get the output
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        // return logs
+        return GitModuleHelper::formatModuleLogsToJson($output, $module_name);
     }
 
     /**
@@ -136,6 +226,34 @@ class GitModule
         } else {
             return $output;
         }
+    }
+
+    /**
+     * getModuleCurrentLog function
+     *
+     * @param [type] $module_name
+     * @param [type] $remote
+     * @param [type] $head
+     * @return object
+     */
+    public static function getModuleCurrentLog($module_name, $remote = null, $head = null): object
+    {
+        $logs = self::getModuleGitLog($module_name, $remote, $head);
+        return count($logs) > 0 ? $logs[0] : null;
+    }
+
+    /**
+     * getModuleCurrentLogTag function
+     *
+     * @param [type] $module_name
+     * @param [type] $remote
+     * @param [type] $head
+     * @return object
+     */
+    public static function getModuleCurrentLogByTag($module_name, $remote = null, $head = null): object
+    {
+        $logs = self::getModuleGitLogByTag($module_name, $remote, $head);
+        return count($logs) > 0 ? $logs[0] : null;
     }
 
     /**
@@ -195,6 +313,22 @@ class GitModule
     }
 
     /**
+     *
+     * getModuleCurrentCommit function
+     *
+     * @return string | null
+     */
+    public static function getModuleCurrentCommit($module_name, $remote = null, $head = null): string | null
+    {
+        $commits = self::getModuleCommits($module_name, $remote, $head);
+        return !is_array($commits) ? $commits : $commits[0];
+    }
+
+    /**
+    * Git File & Folder Operation
+     */
+
+    /**
      * readGitConfig function
      *
      * @return array
@@ -244,47 +378,6 @@ class GitModule
     }
 
     /**
-     * deleteModule function
-     *
-     * @return bool | null
-     */
-    public static function deleteModule($module_slug): bool | null
-    {
-        // guard clause
-        $pwd = GitModuleHelper::buildModuleDir($module_slug);
-
-        // if already non exist
-        if (!file_exists($pwd)) return true;
-
-        // guard clause to prevent any input error that
-        // can remove unwanted directories
-        $isModuleNameDots            = $module_slug == '' || $module_slug == '*' || $module_slug == '.' || $module_slug == '..';
-        $isModuleDirPartOfBaseModule = GitModuleHelper::isDirInBaseModule($pwd);
-        if ($isModuleNameDots || !$isModuleDirPartOfBaseModule) {
-            throw new InvalidArgumentException(
-                "There's some security issue with your targeted directory.. \n" .
-                    "Module Name        : $module_slug \n" .
-                    "Targeted Directory : $pwd \n"
-            );
-        }
-
-        // confirm for the last time, with the provided information
-        // which folder that want to be deleted
-        self::removeDirectories($pwd);
-        return !file_exists($pwd);
-    }
-
-    /**
-     * deleteModuleByRepo function
-     *
-     * @return bool | null
-     */
-    public static function deleteModuleByRepo($repo_url): bool | null
-    {
-        return GitModule::deleteModule(GitModuleHelper::buildModuleSlug(($repo_url)));
-    }
-
-    /**
      * removeDirectories function
      *
      * @return string | ProcessFailedException | null
@@ -316,6 +409,8 @@ class GitModule
     }
 
     // ======== OLD METHODS
+    // Hapus atau tidak nih ?
+
     /**
      * fetch function
      *
