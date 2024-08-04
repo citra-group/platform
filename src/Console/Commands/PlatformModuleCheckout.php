@@ -19,6 +19,7 @@ class PlatformModuleCheckout extends Command
         {module?}
         {--by-commit}
         {--by-tag}
+        {--by-branch}
         {--nofetch=false}
         {ref?}
     ';
@@ -45,6 +46,7 @@ class PlatformModuleCheckout extends Command
             $module     = $this->argument('module');
             $byCommit   = $this->option('by-commit');
             $byTag      = $this->option('by-tag');
+            $byBranch   = $this->option('by-branch');
             $ref        = $this->argument('ref');
             $nofetch    = $this->option('nofetch') == 'true';
 
@@ -68,6 +70,11 @@ class PlatformModuleCheckout extends Command
                 $success = $this->handleByCommit($module, $ref);
             }
 
+            // For refs by tags or production mode
+            if ($byBranch && !$byCommit && !$byTag) {
+                $success = $this->handleByBranch($module, $ref);
+            }
+
             // return
             if (!isset($success) || is_null($success)) {
                 return $this->info('Tags or Commit not defined');
@@ -86,16 +93,56 @@ class PlatformModuleCheckout extends Command
      *
      * @return bool | null
      */
+    protected function handleByBranch($module, $branch): bool | null
+    {
+        // -> For refs by tags or production mode
+        $this->info('Trying to checkout by branch..');
+
+        // -> get list of tags
+        $output = GitModule::getModuleBranches($module);
+        if ($output instanceof ProcessFailedException) {
+            throw $output;
+        }
+        if (!is_array($output)) {
+            throw $output;
+        }
+        if (count($output) <= 0) {
+            return $this->info("There are no branches found");
+        }
+
+        // -> current tag / head
+        $log = GitModule::getModuleCurrentLog($module);
+        $current_branch = 'Not Found';
+        if (count($log->branches) > 0) {
+            $current_branch = $log->branches[0];
+        }
+        if (!is_null($current_branch)) {
+            $this->info('Current Branch : ' . $current_branch);
+        }
+
+        // -> check if tags found
+        while (!in_array($branch, $output)) {
+            if (is_null($branch)) {
+                $branch = $this->choice('Branch Not Found, Select Branch', $output);
+            } else {
+                $branch = $this->choice('Branch Not Found, Select Branch', $output);
+            }
+        }
+
+        // return
+        return GitModule::checkoutModule($branch, $module);;
+    }
+
+
+    /**
+     * handle function
+     *
+     * @return bool | null
+     */
     protected function handleByTag($module, $tag): bool | null
     {
         // -> For refs by tags or production mode
         $this->info('Trying to checkout by tag..');
-
-        // -> procced to fetch
-        $output = GitModule::fetchModule($module);
-        if ($output instanceof ProcessFailedException) {
-            throw $output;
-        }
 
         // -> get list of tags
         $output = GitModule::getModuleTags($module);
@@ -110,7 +157,7 @@ class PlatformModuleCheckout extends Command
         }
 
         // -> current tag / head
-        $log = GitModule::getCurrentLog($module);
+        $log = GitModule::getModuleCurrentLog($module);
         $current_tag = 'Not Found';
         if (count($log->tags) > 0) {
             $current_tag = $log->tags[0];

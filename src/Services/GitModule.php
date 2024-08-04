@@ -140,18 +140,24 @@ class GitModule
      *
      * @return array | null
      */
-    public static function getModuleGitBranchs($module_name, $remote = null, $head = null): array | null
+    public static function getModuleBranches($module_name, $remote = null, $head = null): array | null
     {
-
+        // git fetch --prune remove
+        $command = ['git', 'branch', '-r', "--format='%(refname:short)[SEPARATOR]'"];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        $output  = explode('[SEPARATOR]',$output);
+        return GitModuleHelper::formatModuleBranches($output, $module_name);
     }
+
 
     /**
      *
-     * getModuleGitLog function
+     * getModuleLog function
      *
      * @return array | ProcessFailedException | null
      */
-    public static function getModuleGitLog($module_name, $remote = null, $head = null): array | null
+    public static function getModuleLog($module_name, $remote = null, $head = null): array | null
     {
         // git log commit with pretty format
         // git log --pretty=format:'{ commit:%H, refs:%(decorate:prefix=\",suffix=\",separator=|,tag=), unix_time:%ct }'
@@ -175,7 +181,7 @@ class GitModule
      */
     public static function getModuleCommits($module_name, $remote = null, $head = null): array | ProcessFailedException | null
     {
-        $logs = self::getModuleGitLog($module_name, $remote, $head);
+        $logs = self::getModuleLog($module_name, $remote, $head);
         if (!is_array($logs)) {
             return $logs;
         }
@@ -188,11 +194,11 @@ class GitModule
 
    /**
      *
-     * getModuleGitLogByTag function
+     * getModuleLogByTag function
      *
      * @return array | null
      */
-    public static function getModuleGitLogByTag($module_name, $remote = null, $head = null): array | null
+    public static function getModuleLogByTag($module_name, $remote = null, $head = null): array | null
     {
         // git log commit with pretty format
         // git log --pretty=format:'{ commit:%H, refs:%(decorate:prefix=\",suffix=\",separator=|,tag=), unix_time:%ct }'
@@ -208,11 +214,11 @@ class GitModule
 
     /**
      *
-     * getModuleGitLogByRef function
+     * getModuleLogByRef function
      *
      * @return stdClass | null
      */
-    public static function getModuleGitLogByRef($module_name, $ref): stdClass | null
+    public static function getModuleLogByRef($module_name, $ref): stdClass | null
     {
         // this one doesn use remotes and branch because ref automatically sync with previous fetch
         $command = ['git', 'log', $ref, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
@@ -238,7 +244,7 @@ class GitModule
      */
     public static function getModuleCurrentLog($module_name, $remote = null, $head = null): object
     {
-        $logs = self::getModuleGitLog($module_name, $remote, $head);
+        $logs = self::getModuleLog($module_name, $remote, $head);
         return count($logs) > 0 ? $logs[0] : null;
     }
 
@@ -252,7 +258,7 @@ class GitModule
      */
     public static function getModuleCurrentLogByTag($module_name, $remote = null, $head = null): object
     {
-        $logs = self::getModuleGitLogByTag($module_name, $remote, $head);
+        $logs = self::getModuleLogByTag($module_name, $remote, $head);
         return count($logs) > 0 ? $logs[0] : null;
     }
 

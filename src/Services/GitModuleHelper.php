@@ -140,6 +140,43 @@ class GitModuleHelper
 
     /**
      *
+     * filterModuleRefsAsBranches function
+     *
+     * @return array
+     */
+    public static function filterModuleRefsAsBranches($log): array
+    {
+        $result = [];
+        foreach ($log->refs as $ref) {
+            // is not a tags
+            if ( !in_array($ref, $log->tags) ) {
+                // just incase remote/branch
+                $split = explode( '/', $ref );
+                if(count($split)>1){
+                    $branch = trim($split[1]);
+                } else {
+                    $branch = trim($split[0]);
+                }
+                // just incase 2 head -> branch
+                $split = explode("->", $branch);
+                if(count($split)>1){
+                    $branch = trim($split[1]);
+                } else {
+                    $branch = trim($split[0]);
+                }
+                // and is not head
+                $isNotHead = !str_contains($branch, 'HEAD') && !str_contains($branch, 'head');
+                // check if already appended
+                if( !in_array($branch, $result) && $isNotHead ){
+                    array_push($result,$branch);
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     *
      * formatModuleLogsToJson function
      *
      * @return array
@@ -171,12 +208,36 @@ class GitModuleHelper
             if (!is_null($object)) {
                 $object->refs = explode("|", $object->refs);
                 $object->tags = self::filterModuleRefsAsTag($object->refs, $remote, $branch);
+                $object->branches = self::filterModuleRefsAsBranches($object);
                 array_push($result, $object);
             }
         }
         return $result;
     }
 
-
-
+    /**
+     *
+     * formatModuleBranches function
+     *
+     * @return array
+     */
+    public static function formatModuleBranches($branches, $module_name): array
+    {
+        $result = [];
+        foreach ($branches as $branch) {
+            // just incase 2 remote/branch -> remote/branch
+            $split = explode("->", $branch);
+            $branch = $split[0];
+            // just incase remote/branch
+            $split = explode( '/', $branch );
+            if(count($split)>1){
+                $branch = trim($split[1]);
+                // and is not head
+                $isNotHead = !str_contains($branch, 'HEAD') && !str_contains($branch, 'head');
+                // check if already appended
+                if( $isNotHead ) array_push($result,$branch);
+            }
+        }
+        return $result;
+    }
 }
