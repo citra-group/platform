@@ -50,7 +50,46 @@ class GitModule
         $command = ['git', 'checkout', $ref];
         $pwd     = GitModuleHelper::buildModuleDir($module_name);
         $output  = self::process($command, $pwd);
-        return $output == '';
+        return $output;
+    }
+
+    /**
+     *
+     * checkoutModuleByCommit function
+     *
+     * @return bool | null
+     */
+    public static function checkoutModuleByCommit($ref,$module_name):  bool | null
+    {
+        $output = self::checkoutModule($ref,$module_name);
+        $log = self::getModuleCurrentLog($module_name);
+        return $log->commit == $ref;
+    }
+
+    /**
+     *
+     * checkoutModuleByTag function
+     *
+     * @return bool | null
+     */
+    public static function checkoutModuleByTag($ref,$module_name):  bool | null
+    {
+        $output = self::checkoutModule($ref,$module_name);
+        $log = self::getModuleCurrentLog($module_name);
+        return in_array($ref,$log->tags);
+    }
+
+    /**
+     *
+     * checkoutModuleByBranch function
+     *
+     * @return bool | null
+     */
+    public static function checkoutModuleByBranch($ref,$module_name):  bool | null
+    {
+        $output = self::checkoutModule($ref,$module_name);
+        $log = self::getModuleCurrentLog($module_name);
+        return in_array($ref,$log->branches);
     }
 
     /**

@@ -130,7 +130,7 @@ class PlatformModuleCheckout extends Command
         }
 
         // return
-        return GitModule::checkoutModule($branch, $module);;
+        return GitModule::checkoutModuleByBranch($branch, $module);;
     }
 
 
@@ -176,7 +176,7 @@ class PlatformModuleCheckout extends Command
         }
 
         // return
-        return GitModule::checkoutModule($tag, $module);;
+        return GitModule::checkoutModuleByTag($tag, $module);;
     }
 
     /**
@@ -189,8 +189,11 @@ class PlatformModuleCheckout extends Command
         // -> For refs by tags or production mode
         $this->info('Trying to checkout by commit..');
 
+        // Get Current Remote And Branches
+        $remotes = GitModule::getModuleRemoteAndBranch($module);
+
         // -> get list of refs
-        $output = GitModule::getModuleCommits($module, 'origin', 'main');
+        $output = GitModule::getModuleCommits($module, $remotes[0], $remotes[1]);
         if ($output instanceof ProcessFailedException) {
             throw $output;
         }
@@ -206,8 +209,9 @@ class PlatformModuleCheckout extends Command
         if (!is_null($current_commit)) {
             $this->info('Current Refs : ' . $current_commit);
         }
+
         // -> latest tag
-        $latest_commit = GitModule::getModuleCurrentCommit($module, 'origin', 'main');
+        $latest_commit = GitModule::getModuleCurrentCommit($module, $remotes[0],$remotes[1]);
         if (!is_null($latest_commit)) {
             $this->info('Latest Refs : ' . $latest_commit);
         }
@@ -222,6 +226,6 @@ class PlatformModuleCheckout extends Command
         }
 
         // return
-        return GitModule::checkoutModule($ref, $module);;
+        return GitModule::checkoutModuleByCommit($ref, $module);;
     }
 }
