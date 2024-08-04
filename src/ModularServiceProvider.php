@@ -32,6 +32,7 @@ use CitraGroup\Platform\Console\Commands\PlatformModuleInstall;
 use CitraGroup\Platform\Console\Commands\PlatformModuleMigrate;
 use CitraGroup\Platform\Console\Commands\PlatformMakeController;
 use CitraGroup\Platform\Console\Commands\PlatformMakeNotification;
+use CitraGroup\Platform\Console\Commands\PlatformModuleFetch;
 
 class ModularServiceProvider extends ServiceProvider
 {
@@ -118,6 +119,7 @@ class ModularServiceProvider extends ServiceProvider
                 PlatformMakeResource::class,
                 PlatformMakeSeed::class,
                 PlatformModuleClone::class,
+                PlatformModuleFetch::class,
                 PlatformModuleDelete::class,
                 PlatformModuleInstall::class,
                 PlatformModuleList::class,

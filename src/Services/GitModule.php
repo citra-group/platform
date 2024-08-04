@@ -4,6 +4,12 @@ namespace CitraGroup\Platform\Services;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use CitraGroup\Platform\Services\GitModuleHelper;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use FilesystemIterator;
+use InvalidArgumentException;
+use stdClass;
 
 class GitModule
 {
@@ -16,6 +22,300 @@ class GitModule
      * ->info()     : git log --name-status HEAD^..HEAD => on dev | git tag -n => on production
      */
 
+    /**
+     * process function
+     *$this-o
+     * @return string | null
+     */
+    protected static function process($command, $pwd = null): string | null
+    {
+        $process = new Process($command);
+        if (!is_null($pwd)) {
+            $process->setWorkingDirectory($pwd);
+        }
+        $process->run();
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+        return $process->getOutput();
+    }
+
+    /**
+     *
+     * checkoutModule function
+     *
+     * @return bool | null
+     */
+    public static function checkoutModule($ref, $module_name): bool | null
+    {
+        $command = ['git', 'checkout', $ref];
+        $pwd     = GitModuleHelper::buildModuleDir('');
+        $output  = self::process($command, $pwd);
+        return $output == '';
+    }
+
+    /**
+     * cloneModule function
+     *
+     * @return string | null
+     */
+    public static function cloneModule($repo_url, $target_folder = ''): string | null
+    {
+        if($target_folder != ''){
+            $command = ['git', 'clone', $repo_url, $target_folder];
+        } else {
+            $command = ['git', 'clone', $repo_url];
+        }
+        $pwd     = GitModuleHelper::buildModuleDir('');
+        $output  = self::process($command, $pwd);
+        return $output;
+    }
+
+    /**
+     * fetchModule function
+     *
+     * @return string | null
+     */
+    public static function fetchModule($module_name): string | null
+    {
+        // git fetch --prune remove
+        $command = ['git', 'fetch', '--all', '--prune', '--prune-tags'];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        return $output;
+    }
+
+    /**
+     *
+     * getModuleCommits function
+     *
+     * @return array | ProcessFailedException | null
+     */
+    public static function getModuleCommits($module_name, $remote = null, $head = null): array | ProcessFailedException | null
+    {
+        $logs = self::getModuleGitLog($module_name, $remote, $head);
+        if (!is_array($logs)) {
+            return $logs;
+        }
+        $commits = [];
+        foreach ($logs as $log) {
+            array_push($commits, $log->commit);
+        }
+        return $commits;
+    }
+
+    /**
+     *
+     * getModuleCurrentCommit function
+     *
+     * @return string | null
+     */
+    public static function getModuleCurrentCommit($module_name, $remote = null, $head = null): string | null
+    {
+        $commits = self::getModuleCommits($module_name, $remote, $head);
+        return !is_array($commits) ? $commits : $commits[0];
+    }
+
+    /**
+     *
+     * getModuleGitLogByRef function
+     *
+     * @return stdClass | null
+     */
+    public static function getModuleGitLogByRef($module_name, $ref): stdClass | null
+    {
+        // this one doesn use remotes and branch because ref automatically sync with previous fetch
+        $command = ['git', 'log', $ref, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
+        $pwd     = GitModuleHelper::buildModuleDir('');
+        $output  = self::process($command, $pwd);
+        // logs
+        $logs = GitModuleHelper::formatModuleLogsToJson($output, $module_name);
+        if (is_array($logs)) {
+            if (count($logs) > 0) return $logs[0];
+            else                  return null;
+        } else {
+            return $output;
+        }
+    }
+
+    /**
+     *
+     * getModuleTags function
+     *
+     * @return array  null
+     */
+    public static function getModuleTags($module_name): array | null
+    {
+        $command = ['git', 'tag', '--sort=-v:refname'];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        return GitModuleHelper::formatModuleTags($output);
+    }
+
+    /**
+     *
+     * getModuleLatestTag function
+     *
+     * @return string | null
+     */
+    public static function getModuleLatestTag($module_name): string | null
+    {
+        // automatically sorted by the git command
+        $tags = self::getModuleTags($module_name);
+        return count($tags) > 0 ? $tags[0] : null;
+    }
+
+    /**
+     * getModuleRemote function
+     *
+     * @return string
+     */
+    public static function getModuleSymbolicRef($module_name): string
+    {
+        $command = ['git', 'symbolic-ref', 'refs/remotes/origin/HEAD', '--short'];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        // expected return origin/[branch-name]
+        $output  = self::process($command, $pwd);
+        return $output;
+    }
+
+    /**
+     * getModuleRemote function
+     *
+     * @return array
+     */
+    public static function getModuleRemoteAndBranch($module_name): array
+    {
+        // expected return origin/[branch-name]
+        $refs  = trim(self::getModuleSymbolicRef($module_name));
+        $split = explode('/', $refs);
+        if (count($split) > 0) return $split;
+        else                   throw new Exception("expected return origin/[branch-name]");
+        // expected [origin,[branch_name]]
+    }
+
+    /**
+     * readGitConfig function
+     *
+     * @return array
+     */
+    public static function readGitConfig($module_name): array
+    {
+        return self::readGitConfigByPath(self::buildModuleDir($module_name));
+    }
+
+    /**
+     * readGitConfig function
+     *
+     * @return array
+     */
+    public static function readGitConfigByPath($module_path): array
+    {
+        $git_file = fopen($module_path . DIRECTORY_SEPARATOR . '.git' . DIRECTORY_SEPARATOR . 'config', 'r');
+        $configs = [];
+
+        // proceed to read git config line_by_line.
+        while (($line = fgets($git_file)) !== false) {
+            $line = trim($line);
+
+            // check if its parent config
+            preg_match('/(?<=\[).+(?=])/', $line, $is_parent_config);
+
+            if (count($is_parent_config) > 0) {
+                $is_parent_config[0] = str_replace('"', '', $is_parent_config[0]);
+                $parent_config = explode(' ', $is_parent_config[0]);
+
+                array_push($configs, [
+                    'name'  => count($parent_config) > 1 ? trim($parent_config[0]) : trim($parent_config[0]),
+                    'value' => count($parent_config) > 1 ? trim($parent_config[1]) : null,
+                    'properties' => [],
+                ]);
+            } else {
+                $properties = explode('=', $line);
+                array_push($configs[count($configs) - 1]['properties'], [
+                    'name'  => count($properties) > 1 ? trim($properties[0]) : trim($properties[0]),
+                    'value' => count($properties) > 1 ? trim($properties[1]) : null,
+                ]);
+            }
+        }
+
+        fclose($git_file);
+        return $configs;
+    }
+
+    /**
+     * deleteModule function
+     *
+     * @return bool | null
+     */
+    public static function deleteModule($module_slug): bool | null
+    {
+        // guard clause
+        $pwd = GitModuleHelper::buildModuleDir($module_slug);
+
+        // if already non exist
+        if (!file_exists($pwd)) return true;
+
+        // guard clause to prevent any input error that
+        // can remove unwanted directories
+        $isModuleNameDots            = $module_slug == '' || $module_slug == '*' || $module_slug == '.' || $module_slug == '..';
+        $isModuleDirPartOfBaseModule = GitModuleHelper::isDirInBaseModule($pwd);
+        if ($isModuleNameDots || !$isModuleDirPartOfBaseModule) {
+            throw new InvalidArgumentException(
+                "There's some security issue with your targeted directory.. \n" .
+                    "Module Name        : $module_slug \n" .
+                    "Targeted Directory : $pwd \n"
+            );
+        }
+
+        // confirm for the last time, with the provided information
+        // which folder that want to be deleted
+        self::removeDirectories($pwd);
+        return !file_exists($pwd);
+    }
+
+    /**
+     * deleteModuleByRepo function
+     *
+     * @return bool | null
+     */
+    public static function deleteModuleByRepo($repo_url): bool | null
+    {
+        return GitModule::deleteModule(GitModuleHelper::buildModuleSlug(($repo_url)));
+    }
+
+    /**
+     * removeDirectories function
+     *
+     * @return string | ProcessFailedException | null
+     */
+    public static function removeDirectories(string $dir_path): void
+    {
+        if (file_exists($dir_path)) {
+            $di = new RecursiveDirectoryIterator($dir_path, FilesystemIterator::SKIP_DOTS);
+            $ri = new RecursiveIteratorIterator($di, RecursiveIteratorIterator::CHILD_FIRST);
+
+            // run recursive for each file
+            foreach ($ri as $file) {
+                // git config somehow can't be deleted due to permission denied
+                $isDir = $file->isDir();
+                $path = $file->getRealPath();
+
+                // prevent permission error from deleting
+                chmod($path, 0777);
+
+                // delete folder if empty and delete file if not folder
+                if ($isDir && GitModuleHelper::isEmptyDirectories($file->getPathname())) rmdir($file);
+                if (!$isDir) unlink($file);
+            }
+
+            // prevent permission error from deleting
+            chmod($dir_path, 0777);
+            if (GitModuleHelper::isEmptyDirectories($dir_path)) rmdir($dir_path);
+        }
+    }
+
+    // ======== OLD METHODS
     /**
      * fetch function
      *
@@ -69,7 +369,7 @@ class GitModule
         $process = Process::fromShellCommandline('git rev-parse --verify HEAD 2> /dev/null');
         $process->setWorkingDirectory($directory);
         $process->run();
-        
+
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
