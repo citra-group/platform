@@ -43,7 +43,7 @@ class PlatformMakeReplica extends Command
 
         /** SET STUB FILE */
         $stubFile = __DIR__ . DIRECTORY_SEPARATOR . 'system-stubs' . DIRECTORY_SEPARATOR . 'model-replica.stub';
-        
+
         /** CHECK STUB IS EXISTS */
         if (!$fileSystem->exists($stubFile)) {
             $this->error('The stub file not exists.');
@@ -68,12 +68,12 @@ class PlatformMakeReplica extends Command
 
         /** SET FILE OUTPUT */
         $filepath = base_path(
-            'modules' . 
+            'modules' .
             DIRECTORY_SEPARATOR .
-            str($module->name)->lower() . 
+            str($module->name)->lower() .
             DIRECTORY_SEPARATOR .
-            'src' . 
-            DIRECTORY_SEPARATOR . 
+            'src' .
+            DIRECTORY_SEPARATOR .
             'Models'
         );
 
