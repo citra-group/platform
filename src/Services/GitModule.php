@@ -380,12 +380,10 @@ class GitModule
      */
     public static function getModuleSymbolicRef($module_name,$fromRemote = false): string
     {
-
-
         if($fromRemote){
-            $command = ['git', 'symbolic-ref', 'refs/remotes/origin/HEAD', '--short'];
+            $command = ['git', 'rev-parse', '--abbrev-ref', 'origin/HEAD'];
         } else {
-            $command = ['git', 'symbolic-ref', 'HEAD', '--short'];
+            $command = ['git', 'rev-parse', '--abbrev-ref', 'HEAD'];
         }
 
         $pwd = GitModuleHelper::buildModuleDir($module_name);
@@ -425,12 +423,15 @@ class GitModule
     /**
      * getModuleBranch function
      *
-     * @return string
+     * @return string | null
      */
-    public static function getModuleBranchLocal($module_name): string
+    public static function getModuleBranchLocal($module_name): string | null
     {
         // expected return [branch-name]
         $refs= trim(self::getModuleSymbolicRef($module_name));
+        if($refs == 'HEAD'){
+            return null; // null means its a HEAD of a commit which is either a tag or commit
+        }
         return $refs;
     }
 
