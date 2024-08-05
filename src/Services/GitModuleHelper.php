@@ -188,9 +188,8 @@ class GitModuleHelper
         $result = [];
 
         // filter remotes refs
-        $refs = GitModule::getModuleRemoteAndBranch($module_name);
-        $remote = $refs[0];
-        $branch = $refs[1];
+        $remote = GitModule::getModuleRemote($module_name);
+        $branch = GitModule::getModuleBranchLocal($module_name);
 
         // formatting all the log as a json object
         foreach ($logs as $log) {

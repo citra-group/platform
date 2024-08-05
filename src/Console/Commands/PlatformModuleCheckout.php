@@ -114,7 +114,7 @@ class PlatformModuleCheckout extends Command
         $log = GitModule::getModuleCurrentLog($module);
         $current_branch = 'Not Found';
         if (count($log->branches) > 0) {
-            $current_branch = $log->branches[0];
+            $current_branch = $log->branch;
         }
         if (!is_null($current_branch)) {
             $this->info('Current Branch : ' . $current_branch);
@@ -190,10 +190,11 @@ class PlatformModuleCheckout extends Command
         $this->info('Trying to checkout by commit..');
 
         // Get Current Remote And Branches
-        $remotes = GitModule::getModuleRemoteAndBranch($module);
+        $remote = GitModule::getModuleRemote($module);
+        $branch = GitModule::getModuleBranchLocal($module);
 
         // -> get list of refs
-        $output = GitModule::getModuleCommits($module, $remotes[0], $remotes[1]);
+        $output = GitModule::getModuleCommits($module, $remote, $branch);
         if ($output instanceof ProcessFailedException) {
             throw $output;
         }
@@ -209,9 +210,8 @@ class PlatformModuleCheckout extends Command
         if (!is_null($current_commit)) {
             $this->info('Current Refs : ' . $current_commit);
         }
-
         // -> latest tag
-        $latest_commit = GitModule::getModuleCurrentCommit($module, $remotes[0],$remotes[1]);
+        $latest_commit = GitModule::getModuleCurrentCommit($module, $remote,$branch);
         if (!is_null($latest_commit)) {
             $this->info('Latest Refs : ' . $latest_commit);
         }

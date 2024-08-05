@@ -47,7 +47,21 @@ class GitModule
      */
     public static function checkoutModule($ref, $module_name): bool | null
     {
-        $command = ['git', 'checkout', $ref];
+        $command = ['git', 'checkout', '-f', $ref];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        return $output;
+    }
+
+    /**
+     *
+     * resetRef function
+     *
+     * @return bool | null
+     */
+    public static function resetRef($ref, $module_name, $remote): bool | null
+    {
+        $command = ['git', 'reset', '--hard', $remote.'/'.$ref];
         $pwd     = GitModuleHelper::buildModuleDir($module_name);
         $output  = self::process($command, $pwd);
         return $output;
@@ -189,6 +203,20 @@ class GitModule
         return GitModuleHelper::formatModuleBranches($output, $module_name);
     }
 
+    /**
+     *
+     * getModuleGitBranchs function
+     *
+     * @return string | null
+     */
+    public static function getModuleCurrentBranch($module_name, $remote = null, $head = null): string | null
+    {
+        // git fetch --prune remove
+        $command = ['git', 'rev-parse', '--abbrev-ref', 'HEAD'];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        return $output;
+    }
 
     /**
      *
@@ -203,11 +231,9 @@ class GitModule
         $remote_head_exist = !is_null($remote) && !is_null($head);
         if ($remote_head_exist) $command = ['git', 'log', $remote, $head, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
         else                    $command = ['git', 'log', "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
-
         // proceed to get the output
         $pwd     = GitModuleHelper::buildModuleDir($module_name);
         $output  = self::process($command, $pwd);
-
         // return logs
         return GitModuleHelper::formatModuleLogsToJson($output, $module_name);
     }
@@ -261,7 +287,7 @@ class GitModule
     {
         // this one doesn use remotes and branch because ref automatically sync with previous fetch
         $command = ['git', 'log', $ref, "--pretty=format:{ \"commit\":\"%H\", \"body\":\"%B\", \"refs\":\"%(decorate:prefix=,suffix=,separator=|,tag=)\", \"unix_time\":%ct }[EXPLODE]"];
-        $pwd     = GitModuleHelper::buildModuleDir('');
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
         $output  = self::process($command, $pwd);
         // logs
         $logs = GitModuleHelper::formatModuleLogsToJson($output, $module_name);
@@ -271,6 +297,25 @@ class GitModule
         } else {
             return $output;
         }
+    }
+
+    /**
+     * getModuleCurrentLog function
+     *
+     * @param [type] $module_name
+     * @param [type] $remote
+     * @param [type] $head
+     * @return object
+     */
+    public static function getModuleCurrentLogByBranch($module_name,$git_address,$target_branch): object
+    {
+        // this one doesn use remotes and branch because ref automatically sync with previous fetch
+        $command = ['git', 'ls-remote',$git_address];
+        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+        $output  = self::process($command, $pwd);
+        // temporary using regex
+        preg_match('/(.+)\srefs\/heads\/'.$target_branch.'/', $output, $output_array);
+        return self::getModuleLogByRef( $module_name, trim($output_array[1]) );
     }
 
     /**
@@ -333,10 +378,17 @@ class GitModule
      *
      * @return string
      */
-    public static function getModuleSymbolicRef($module_name): string
+    public static function getModuleSymbolicRef($module_name,$fromRemote = false): string
     {
-        $command = ['git', 'symbolic-ref', 'refs/remotes/origin/HEAD', '--short'];
-        $pwd     = GitModuleHelper::buildModuleDir($module_name);
+
+
+        if($fromRemote){
+            $command = ['git', 'symbolic-ref', 'refs/remotes/origin/HEAD', '--short'];
+        } else {
+            $command = ['git', 'symbolic-ref', 'HEAD', '--short'];
+        }
+
+        $pwd = GitModuleHelper::buildModuleDir($module_name);
         // expected return origin/[branch-name]
         $output  = self::process($command, $pwd);
         return $output;
@@ -347,14 +399,39 @@ class GitModule
      *
      * @return array
      */
-    public static function getModuleRemoteAndBranch($module_name): array
+    public static function getModuleRemote($module_name): string | null
+    {
+        return 'origin'; // temporary
+    }
+
+    /**
+     * getModuleRemoteBranch function
+     *
+     * @return string
+     */
+    public static function getModuleRemoteBranch($module_name): string
     {
         // expected return origin/[branch-name]
-        $refs  = trim(self::getModuleSymbolicRef($module_name));
+        $refs  = trim(self::getModuleSymbolicRef($module_name, true));
         $split = explode('/', $refs);
-        if (count($split) > 0) return $split;
-        else                   throw new Exception("expected return origin/[branch-name]");
-        // expected [origin,[branch_name]]
+        // replace
+        if (count($split) > 0) {
+            return $split[1];
+        } else {
+            throw new Exception("expected return origin/[branch-name]");
+        }
+    }
+
+    /**
+     * getModuleBranch function
+     *
+     * @return string
+     */
+    public static function getModuleBranchLocal($module_name): string
+    {
+        // expected return [branch-name]
+        $refs= trim(self::getModuleSymbolicRef($module_name));
+        return $refs;
     }
 
     /**
