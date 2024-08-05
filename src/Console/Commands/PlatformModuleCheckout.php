@@ -97,7 +97,6 @@ class PlatformModuleCheckout extends Command
     {
         // -> For refs by tags or production mode
         $this->info('Trying to checkout by branch..');
-
         // -> get list of tags
         $output = GitModule::getModuleBranches($module);
         if ($output instanceof ProcessFailedException) {
@@ -109,17 +108,11 @@ class PlatformModuleCheckout extends Command
         if (count($output) <= 0) {
             return $this->info("There are no branches found");
         }
-
         // -> current tag / head
-        $log = GitModule::getModuleCurrentLog($module);
-        $current_branch = 'Not Found';
-        if (count($log->branches) > 0) {
-            $current_branch = $log->branch;
+        $branch = GitModule::getModuleCurrentBranch($module);
+        if (!is_null($branch)) {
+            $this->info('Current Branch : ' . $branch);
         }
-        if (!is_null($current_branch)) {
-            $this->info('Current Branch : ' . $current_branch);
-        }
-
         // -> check if tags found
         while (!in_array($branch, $output)) {
             if (is_null($branch)) {
@@ -128,7 +121,6 @@ class PlatformModuleCheckout extends Command
                 $branch = $this->choice('Branch Not Found, Select Branch', $output);
             }
         }
-
         // return
         return GitModule::checkoutModuleByBranch($branch, $module);;
     }
