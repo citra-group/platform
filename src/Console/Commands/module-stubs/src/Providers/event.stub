@@ -2,6 +2,9 @@
 
 namespace $NAMESPACE$\$MODULE$\Providers;
 
+use ReflectionProperty;
+use Illuminate\Support\Arr;
+use CitraGroup\Platform\DiscoverEvents;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -33,6 +36,17 @@ class EventServiceProvider extends ServiceProvider
         static::setEventDiscoveryPaths([
             __DIR__ . '/../Listeners',
         ]);
+
+        $events     = $this->discoverEvents();
+        $provider   = Arr::first($this->app->getProviders(ServiceProvider::class));
+
+        if (!$provider || empty($events)) {
+            return;
+        }
+
+        $listen = new ReflectionProperty($provider, 'listen');
+        $listen->setAccessible(true);
+        $listen->setValue($provider, array_merge_recursive($listen->getValue($provider), $events));
     }
 
     /**
@@ -43,5 +57,24 @@ class EventServiceProvider extends ServiceProvider
     public function shouldDiscoverEvents(): bool
     {
         return true;
+    }
+
+    /**
+     * Discover the events and listeners for the application.
+     *
+     * @return array
+     */
+    public function discoverEvents()
+    {
+        return collect($this->discoverEventsWithin())
+            ->reject(function ($directory) {
+                return ! is_dir($directory);
+            })
+            ->reduce(function ($discovered, $directory) {
+                return array_merge_recursive(
+                    $discovered,
+                    DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
+                );
+            }, []);
     }
 }
