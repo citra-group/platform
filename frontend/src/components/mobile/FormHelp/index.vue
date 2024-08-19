@@ -35,23 +35,19 @@
                     style="z-index: 1"
                 >
                     <div class="d-flex justify-center position-relative">
-                        <v-sheet
-                            :color="`${theme}`"
-                            elevation="4"
-                            rounded="pill"
+                        <div
+                            :class="`text-${theme}`"
+                            class="d-flex justify-center position-relative w-100"
+                            style="z-index: 1"
                         >
-                            <v-card-text class="pa-1">
-                                <v-avatar
-                                    :color="`${theme}-lighten-3`"
-                                    size="52"
-                                    style="font-size: 22px"
-                                >
+                            <div class="circle position-absolute">
+                                <v-avatar size="56">
                                     <v-icon :color="`${theme}-darken-1`"
                                         >menu_open</v-icon
                                     >
                                 </v-avatar>
-                            </v-card-text>
-                        </v-sheet>
+                            </div>
+                        </div>
 
                         <div
                             :class="`text-${theme}-lighten-4`"

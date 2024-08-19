@@ -19,65 +19,8 @@ export const usePageStore = defineStore("pageStore", {
 
         auth: null,
         activityLog: false,
-        accountBase: {
-            domain: "backend",
-            name: "Account",
-            prefix: "account",
-            slug: "account",
-            pages: [
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "dashboard",
-                    name: "Beranda",
-                    order: 1,
-                    parent: true,
-                    parent_path: null,
-                    path: "dashboard",
-                    side: true,
-                    slug: "account-dashboard",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "local_activity",
-                    name: "Aktifitas",
-                    order: 2,
-                    parent: true,
-                    parent_path: null,
-                    path: "activity",
-                    side: true,
-                    slug: "account-activity",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "notifications",
-                    name: "Notifikasi",
-                    order: 3,
-                    parent: true,
-                    parent_path: null,
-                    path: "notification",
-                    side: true,
-                    slug: "account-notification",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "perm_identity",
-                    name: "Setting",
-                    order: 4,
-                    parent: true,
-                    parent_path: null,
-                    path: "setting",
-                    side: true,
-                    slug: "account-setting",
-                },
-            ],
-        },
+        accountBase: {},
+        appsMenus: [],
 
         beforePost: undefined,
 
@@ -240,6 +183,20 @@ export const usePageStore = defineStore("pageStore", {
             this.auth = this.$storage.getItem("auth");
             this.checksum = this.$storage.getItem("checksum");
             this.modules = this.$storage.getItem("modules");
+
+            if (this.modules && "account" in this.modules) {
+                this.accountBase = this.modules.account[0];
+                this.appsMenus = this.accountBase.pages.reduce(
+                    (carry, page) => {
+                        if (page.side === true) {
+                            carry.push(page);
+                        }
+
+                        return carry;
+                    },
+                    []
+                );
+            }
 
             if (this.auth) {
                 this.theme = "theme" in this.auth ? this.auth.theme : "teal";
@@ -490,6 +447,20 @@ export const usePageStore = defineStore("pageStore", {
                     "highlight" in this.auth
                         ? this.auth.highlight
                         : "deep-orange";
+
+                if (this.modules && "account" in this.modules) {
+                    this.accountBase = this.modules.account[0];
+                    this.appsMenus = this.accountBase.pages.reduce(
+                        (carry, page) => {
+                            if (page.side === true) {
+                                carry.push(page);
+                            }
+
+                            return carry;
+                        },
+                        []
+                    );
+                }
 
                 this.$storage.setItem("auth", response.auth);
                 this.$storage.setItem("checksum", response.checksum);

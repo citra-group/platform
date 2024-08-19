@@ -50,7 +50,7 @@
 
             <v-responsive
                 height="calc(100vh - 64px)"
-                class="bg-transparent overflow-x-hidden overflow-y-auto px-4"
+                class="bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
                 content-class="position-relative"
             >
                 <div
@@ -60,7 +60,20 @@
                     <div
                         class="d-flex flex-column align-center justify-center position-relative"
                     >
-                        <v-sheet
+                        <div
+                            :class="`text-${theme}`"
+                            class="d-flex justify-center position-relative w-100"
+                            style="z-index: 1"
+                        >
+                            <div class="circle position-absolute">
+                                <v-avatar size="56">
+                                    <v-icon :color="`${theme}-darken-1`">{{
+                                        helpState ? "menu_open" : "filter_list"
+                                    }}</v-icon>
+                                </v-avatar>
+                            </div>
+                        </div>
+                        <!-- <v-sheet
                             :color="`${theme}`"
                             elevation="4"
                             rounded="pill"
@@ -76,7 +89,7 @@
                                     }}</v-icon>
                                 </v-avatar>
                             </v-card-text>
-                        </v-sheet>
+                        </v-sheet> -->
 
                         <div
                             :class="`text-${theme}-lighten-4`"

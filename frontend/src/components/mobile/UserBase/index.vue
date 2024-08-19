@@ -39,28 +39,17 @@
             :base-color="`${theme}-lighten-2`"
             :color="`${theme}-darken-1`"
         >
-            <v-btn style="width: 25%" :to="{ name: 'account-dashboard' }">
-                <v-icon>space_dashboard</v-icon>
+            <v-btn
+                v-for="(item, index) in appsMenus"
+                :key="index"
+                style="width: 25%"
+                :to="{ name: item.slug }"
+            >
+                <v-icon>{{ item.icon }}</v-icon>
 
-                <div style="margin-top: 2px; font-size: 88%">Beranda</div>
-            </v-btn>
-
-            <v-btn style="width: 25%" :to="{ name: 'account-activity' }">
-                <v-icon>summarize</v-icon>
-
-                <div style="margin-top: 2px; font-size: 88%">Aktifitas</div>
-            </v-btn>
-
-            <v-btn style="width: 25%" :to="{ name: 'account-notification' }">
-                <v-icon>notifications</v-icon>
-
-                <div style="margin-top: 2px; font-size: 88%">Notifikasi</div>
-            </v-btn>
-
-            <v-btn style="width: 25%" :to="{ name: 'account-setting' }">
-                <v-icon>perm_identity</v-icon>
-
-                <div style="margin-top: 2px; font-size: 88%">Setting</div>
+                <div style="margin-top: 2px; font-size: 88%">
+                    {{ item.name }}
+                </div>
             </v-btn>
         </v-bottom-navigation>
     </v-layout>
@@ -87,6 +76,7 @@ export default {
 
         const {
             auth,
+            appsMenus,
             geoInitialized,
             navigationState,
             overlay,
@@ -98,6 +88,7 @@ export default {
 
         return {
             auth,
+            appsMenus,
             geoInitialized,
             navigationState,
             overlay,
