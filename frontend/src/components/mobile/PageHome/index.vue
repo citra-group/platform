@@ -204,7 +204,7 @@ export default {
 
     methods: {
         gotoAccountService: function () {
-            this.$router.push({ name: "account-service" });
+            this.$router.push({ name: "account-module" });
         },
 
         openPage: function (page) {
