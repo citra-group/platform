@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
+use CitraGroup\Platform\Http\Middleware\Impersonate;
 use CitraGroup\Platform\Console\Commands\PlatformInstall;
 use CitraGroup\Platform\Console\Commands\PlatformMakeJob;
 use CitraGroup\Platform\Console\Commands\PlatformMakeSeed;
@@ -42,6 +43,9 @@ class ModularServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /** ADD MIDDLEWARE */
+        $this->app->router->pushMiddlewareToGroup('api', Impersonate::class);
+
         /** Disable wrapping of the outer-most resource array. */
         JsonResource::withoutWrapping();
 
@@ -59,23 +63,23 @@ class ModularServiceProvider extends ServiceProvider
 
         /** Publish asset, config and frontend-components */
         $this->publishes([
-            __DIR__.'/../.eslintrc.js' => base_path('.eslintrc.js'),
-            __DIR__.'/../config/database.php' => config_path('database.php'),
-            __DIR__.'/../config/cors.php' => config_path('cors.php'),
-            __DIR__.'/../modules' => base_path('modules'),
-            __DIR__.'/../package.json' => base_path('package.json'),
-            __DIR__.'/../routes' => base_path('routes'),
-            __DIR__.'/../seeders' => database_path('seeders'),
-            __DIR__.'/../vite.config.mjs' => base_path('vite.config.mjs'),
+            __DIR__ . '/../.eslintrc.js' => base_path('.eslintrc.js'),
+            __DIR__ . '/../config/database.php' => config_path('database.php'),
+            __DIR__ . '/../config/cors.php' => config_path('cors.php'),
+            __DIR__ . '/../modules' => base_path('modules'),
+            __DIR__ . '/../package.json' => base_path('package.json'),
+            __DIR__ . '/../routes' => base_path('routes'),
+            __DIR__ . '/../seeders' => database_path('seeders'),
+            __DIR__ . '/../vite.config.mjs' => base_path('vite.config.mjs'),
         ], 'citragroup-config');
 
         $this->publishes([
-            __DIR__.'/../frontend' => resource_path(),
+            __DIR__ . '/../frontend' => resource_path(),
         ], 'citragroup-frontend');
 
         $this->publishes([
-            __DIR__.'/../assets' => resource_path('assets'),
-            __DIR__.'/../avatars' => resource_path('avatars'),
+            __DIR__ . '/../assets' => resource_path('assets'),
+            __DIR__ . '/../avatars' => resource_path('avatars'),
         ], 'citragroup-assets');
     }
 
