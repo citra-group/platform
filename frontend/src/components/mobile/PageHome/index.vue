@@ -10,7 +10,7 @@
 
         <v-spacer></v-spacer>
 
-        <slot name="toolbar"></slot>
+        <slot name="toolbar" :statuses="statuses"></slot>
 
         <v-btn icon @click="gotoAccountService">
             <v-icon>exit_to_app</v-icon>
@@ -175,6 +175,7 @@ export default {
             pulse,
             railMode,
             record,
+            statuses,
             theme,
         } = storeToRefs(store);
 
@@ -192,6 +193,7 @@ export default {
             railMode,
             record,
             dockMenus,
+            statuses,
             theme,
         };
     },

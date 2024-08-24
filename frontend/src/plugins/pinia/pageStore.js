@@ -365,8 +365,9 @@ export const usePageStore = defineStore("pageStore", {
                 `${
                     this.module.prefix ? this.module.prefix + "/" : ""
                 }api/dashboard`
-            ).then(({ record }) => {
+            ).then(({ record, statuses }) => {
                 this.record = record;
+                this.statuses = statuses;
 
                 if (typeof callback === "function") {
                     callback(record);
