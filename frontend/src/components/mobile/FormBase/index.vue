@@ -3,22 +3,10 @@
         <v-sheet
             class="position-absolute text-center w-100"
             color="transparent"
-            style="z-index: 1; top: -28px"
+            style="z-index: 1; top: -36px"
         >
             <div class="d-flex justify-center position-relative">
-                <v-sheet :color="`${theme}`" elevation="4" rounded="pill">
-                    <v-card-text class="pa-1">
-                        <v-avatar
-                            :color="highlight"
-                            size="48"
-                            style="font-size: 22px"
-                        >
-                            <v-icon :color="iconColor ?? 'white'">{{
-                                icon
-                            }}</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-sheet>
+                <form-icon></form-icon>
 
                 <div
                     :class="`text-${theme}-lighten-3`"
@@ -30,7 +18,7 @@
             </div>
         </v-sheet>
 
-        <v-sheet class="mt-7 pt-7" elevation="1" rounded="lg">
+        <v-sheet class="mt-9 pt-9" elevation="1" rounded="lg">
             <slot></slot>
         </v-sheet>
     </v-sheet>

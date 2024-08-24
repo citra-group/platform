@@ -1,24 +1,27 @@
 html {
-    overflow-y: hidden;
+    overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 .circle {
+	position: absolute;
 	top: -50%;
-	height: 66px;
-	width: 66px;
-	border: 5px solid currentColor;
+	width: 64px;
+	height: 64px;
+	border: 6px solid currentColor;
 	border-radius: 50%;
-	background: white;
+	background: currentColor;
+	transition: 0.25s;
 }
 
 .circle::before {
 	content: "";
 	position: absolute;
-	top: 49%;
-	left: -22px;
-	width: 21px;
-	height: 21px;
-	border-top-right-radius: 21px;
+	top: 58%;
+	left: -20px;
+	width: 20px;
+	height: 20px;
+	border-top-right-radius: 20px;
 	background: transparent;
 	box-shadow: 0 -10px 0 0 currentColor;
 }
@@ -26,17 +29,22 @@ html {
 .circle::after {
 	content: "";
 	position: absolute;
-	top: 49%;
-	right: -22px;
-	width: 21px;
-	height: 21px;
-	border-top-left-radius: 21px;
+	top: 58%;
+	right: -20px;
+	width: 20px;
+	height: 20px;
+	border-top-left-radius: 20px;
 	background: transparent;
 	box-shadow: 0 -10px 0 0 currentColor;
 }
 
 .v-icon.with-shadow {
     text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.v-icon--size-dialog {
+    font-size: 88px;
+    font-variation-settings: 'wght' 200;
 }
 
 .font-brand {
@@ -60,6 +68,10 @@ html {
 
 .v-navigation-drawer {
     transition-property: box-shadow, transform, visibility, width, left, right, top, bottom;
+}
+
+.v-navigation-drawer--right + .v-navigation-drawer__scrim {
+    z-index: 1008 !important;
 }
 
 .v-timeline-item__body {

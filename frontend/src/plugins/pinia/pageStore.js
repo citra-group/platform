@@ -26,7 +26,9 @@ export const usePageStore = defineStore("pageStore", {
 
         checksum: null,
         combos: {},
+        currentFile: {},
 
+        dialogFile: false,
         dockMenus: [],
         domain: "backend",
 
@@ -47,6 +49,7 @@ export const usePageStore = defineStore("pageStore", {
         initialized: false,
         itemsPerPage: 10,
         isMobile: false,
+        impersonated: false,
 
         key: null,
 
@@ -81,16 +84,16 @@ export const usePageStore = defineStore("pageStore", {
         parentKey: null,
         parentName: null,
 
-        pulse: {},
-
         railMode: false,
         record: {},
         recordBase: {},
         records: [],
+        routePrefix: false,
 
         search: null,
         selected: [],
         sideMenus: [],
+        sidehelpState: false,
         sidenavState: false,
         snackbar: {
             color: "red",
@@ -104,6 +107,8 @@ export const usePageStore = defineStore("pageStore", {
         theme: "teal",
         totalRecords: 0,
         trashed: null,
+
+        usesync: false,
         usetrash: false,
     }),
 
@@ -360,9 +365,8 @@ export const usePageStore = defineStore("pageStore", {
                 `${
                     this.module.prefix ? this.module.prefix + "/" : ""
                 }api/dashboard`
-            ).then(({ record, pulse }) => {
+            ).then(({ record }) => {
                 this.record = record;
-                this.pulse = pulse;
 
                 if (typeof callback === "function") {
                     callback(record);
@@ -386,6 +390,10 @@ export const usePageStore = defineStore("pageStore", {
                     pagePath = `${this.buildPath}/${
                         this.$route.params[this.pageKey]
                     }`;
+                }
+
+                if (this.routePrefix) {
+                    pagePath = pagePath + this.routePrefix;
                 }
 
                 this.$http(pagePath, {
@@ -448,8 +456,8 @@ export const usePageStore = defineStore("pageStore", {
                         ? this.auth.highlight
                         : "deep-orange";
 
-                if (this.modules && "account" in this.modules) {
-                    this.accountBase = this.modules.account[0];
+                if (response.modules && "account" in response.modules) {
+                    this.accountBase = response.modules.account[0];
                     this.appsMenus = this.accountBase.pages.reduce(
                         (carry, page) => {
                             if (page.side === true) {
@@ -477,25 +485,31 @@ export const usePageStore = defineStore("pageStore", {
             }
 
             this.$http(`account/api/user-modules`).then((response) => {
-                if ("auth" in response) {
-                    this.auth = response.auth;
-                    this.$storage.setItem("auth", response.auth);
-
-                    this.theme =
-                        "theme" in this.auth ? this.auth.theme : "teal";
-                }
-
-                if (
-                    "checksum" in response &&
-                    response.checksum !== this.checksum
-                ) {
-                    this.checksum = response.checksum;
-                    this.$storage.setItem("checksum", response.checksum);
-
-                    this.modules = response.modules;
-                    this.$storage.setItem("modules", response.modules);
-                }
+                this.mapUserModule(response);
             });
+        },
+
+        mapUserModule(response) {
+            if ("auth" in response) {
+                this.auth = response.auth;
+                this.$storage.setItem("auth", response.auth);
+
+                this.theme = "theme" in this.auth ? this.auth.theme : "teal";
+            }
+
+            if ("checksum" in response && response.checksum !== this.checksum) {
+                this.checksum = response.checksum;
+                this.$storage.setItem("checksum", response.checksum);
+
+                this.modules = response.modules;
+                this.$storage.setItem("modules", response.modules);
+            }
+
+            this.impersonated = false;
+
+            if ("impersonated" in response) {
+                this.impersonated = true;
+            }
         },
 
         mapResponseData(response) {
@@ -516,6 +530,7 @@ export const usePageStore = defineStore("pageStore", {
                         headers,
                         icon,
                         key,
+                        parent,
                         recordBase,
                         usetrash,
                         statuses,
@@ -536,6 +551,10 @@ export const usePageStore = defineStore("pageStore", {
 
                     this.icon = icon;
                     this.key = key;
+
+                    this.parent =
+                        parent && Object.keys(parent).length > 0 ? parent : {};
+
                     this.logs = [];
                     this.recordBase =
                         recordBase && Object.keys(recordBase).length > 0
@@ -565,7 +584,13 @@ export const usePageStore = defineStore("pageStore", {
                         this.paramsCache.filters === this.paramsOld.filters
                     ) {
                         data.forEach((record) => {
-                            this.records.push(record);
+                            if (
+                                !this.records.find(
+                                    (rc) => rc[this.key] === record[this.key]
+                                )
+                            ) {
+                                this.records.push(record);
+                            }
                         });
                     } else {
                         this.records = data ?? [];
@@ -587,6 +612,7 @@ export const usePageStore = defineStore("pageStore", {
                         combos,
                         icon,
                         key,
+                        parent,
                         logs,
                         softdelete,
                         statuses,
@@ -597,6 +623,8 @@ export const usePageStore = defineStore("pageStore", {
                         combos && Object.keys(combos).length > 0 ? combos : {};
                     this.icon = icon;
                     this.key = key;
+                    this.parent =
+                        parent && Object.keys(parent).length > 0 ? parent : {};
                     this.logs = logs && Array.isArray(logs) ? logs : [];
                     this.softdelete = softdelete ?? false;
                     this.statuses =
@@ -748,6 +776,7 @@ export const usePageStore = defineStore("pageStore", {
         openFormData() {
             this.formStateLast = JSON.parse(JSON.stringify(this.formState));
             this.record = JSON.parse(JSON.stringify(this.recordBase));
+            this.helpState = false;
 
             if (this.formState === "create") {
                 this.search = null;
@@ -964,6 +993,15 @@ export const usePageStore = defineStore("pageStore", {
             }).then(() => {
                 //
             });
+        },
+
+        setHelpState(state) {
+            this.helpState = state;
+        },
+
+        setSidenavState(state) {
+            this.sidehelpState = false;
+            this.sidenavState = state;
         },
 
         setSelected(item) {

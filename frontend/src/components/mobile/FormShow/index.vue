@@ -1,6 +1,15 @@
 <template>
-    <v-toolbar :color="theme">
-        <v-btn icon @click="openFormData">
+    <v-app-bar
+        :color="`${theme}`"
+        scroll-behavior="hide elevate"
+        scroll-threshold="64"
+    >
+        <v-btn
+            icon
+            @click="
+                manualBacknav ? $emit('click:backnav', $event) : openFormData()
+            "
+        >
             <v-icon class="with-shadow">arrow_back</v-icon>
         </v-btn>
 
@@ -85,35 +94,42 @@
             <v-btn v-if="!hideDelete" color="orange" icon>
                 <v-icon class="with-shadow">delete</v-icon>
 
-                <v-dialog activator="parent" max-width="360" persistent>
-                    <template v-slot:default="{ isActive }">
-                        <v-card
-                            prepend-icon="delete"
-                            text="Proses ini akan juga menghapus semua data yang terkait pada data ini."
-                            title="Hapus data ini?"
-                        >
-                            <template v-slot:actions>
-                                <v-spacer></v-spacer>
+                <form-confirm icon="delete" title="Hapus data ini?">
+                    <div class="text-caption text-grey-darken-1">
+                        Proses ini akan juga menghapus semua data yang terkait
+                        pada data ini.
+                    </div>
 
+                    <template v-slot:actions="{ isActive }">
+                        <v-row dense>
+                            <v-col cols="6">
                                 <v-btn
-                                    color="grey"
-                                    text="Batal"
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="outlined"
+                                    block
                                     @click="isActive.value = false"
-                                ></v-btn>
+                                    >BATAL</v-btn
+                                >
+                            </v-col>
 
+                            <v-col cols="6">
                                 <v-btn
-                                    color="deep-orange"
-                                    text="Hapus"
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="flat"
+                                    block
                                     @click="
                                         postFormDelete(
                                             () => (isActive.value = false)
                                         )
                                     "
-                                ></v-btn>
-                            </template>
-                        </v-card>
+                                    >HAPUS</v-btn
+                                >
+                            </v-col>
+                        </v-row>
                     </template>
-                </v-dialog>
+                </form-confirm>
 
                 <v-tooltip activator="parent" location="bottom"
                     >Hapus</v-tooltip
@@ -141,93 +157,81 @@
                 >Informasi</v-tooltip
             >
         </v-btn>
-    </v-toolbar>
+    </v-app-bar>
 
     <v-sheet
         :color="`${theme}`"
-        class="mx-auto position-absolute w-100 rounded-b-xl"
-        height="192"
+        class="mx-auto position-fixed w-100 rounded-b-xl"
+        height="256"
     ></v-sheet>
 
-    <v-responsive
-        height="calc(100vh - 64px)"
-        class="bg-transparent overflow-x-hidden overflow-y-auto px-4"
-        content-class="position-relative"
-    >
-        <v-sheet
-            class="position-absolute text-center w-100 pt-1"
-            color="transparent"
-            style="z-index: 1"
-        >
-            <div class="d-flex justify-center position-relative">
-                <div
-                    :class="`text-${theme}`"
-                    class="d-flex justify-center position-relative w-100"
-                    style="z-index: 1"
-                >
-                    <div class="circle position-absolute">
-                        <v-avatar size="56">
-                            <v-icon :color="`${theme}-darken-1`">{{
-                                page.icon
-                            }}</v-icon>
-                        </v-avatar>
-                    </div>
-                </div>
+    <v-main>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
+            >
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
 
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
-                    style="
-                        top: 8px;
-                        left: 0;
-                        font-size: 0.63rem !important;
-                        width: calc(50% - 30px);
-                    "
-                >
                     <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
+                        style="
+                            top: 8px;
+                            left: 0;
+                            font-size: 0.63rem !important;
+                            width: calc(50% - 30px);
+                        "
                     >
-                        {{ title }}
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            {{ title }}
+                        </div>
                     </div>
-                </div>
 
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
-                    style="
-                        font-size: 0.63rem !important;
-                        top: 8px;
-                        right: 0;
-                        width: calc(50% - 30px);
-                    "
-                >
                     <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
+                        v-if="!hideDataTag"
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
                     >
-                        show: {{ record[key] }}
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            show: {{ record[key] }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </v-sheet>
+            </v-sheet>
 
-        <v-sheet
-            class="mt-9 pt-7"
-            min-height="200px"
-            elevation="1"
-            rounded="lg"
-        >
-            <slot
-                :combos="combos"
-                :record="record"
-                :theme="theme"
-                :store="store"
-            ></slot>
+            <v-sheet
+                class="position-relative pt-7"
+                elevation="1"
+                min-height="calc(100dvh - 172px)"
+                rounded="lg"
+                flat
+            >
+                <slot
+                    :combos="combos"
+                    :mapResponseData="mapResponseData"
+                    :record="record"
+                    :theme="theme"
+                    :store="store"
+                ></slot>
+            </v-sheet>
         </v-sheet>
-
-        <div class="py-2"></div>
-    </v-responsive>
+    </v-main>
 
     <form-help mode="show" :withActivityLogs="withActivityLogs">
         <template v-slot:forminfo>
@@ -237,6 +241,7 @@
         <template v-slot:helpdesk>
             <slot
                 name="helpdesk"
+                :mapResponseData="mapResponseData"
                 :record="record"
                 :theme="theme"
                 :store="store"
@@ -258,7 +263,10 @@ export default {
         contentClass: String,
         dataFromStore: Boolean,
         hideEdit: Boolean,
+        hideDataTag: Boolean,
         hideDelete: Boolean,
+        manualBacknav: Boolean,
+        routePrefix: String,
         width: {
             type: String,
             default: "500px",
@@ -267,11 +275,16 @@ export default {
         withActivityLogs: Boolean,
     },
 
+    emits: {
+        "click:backnav": null,
+    },
+
     setup(props) {
         const store = usePageStore();
 
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
+        store.routePrefix = props.routePrefix;
 
         const {
             combos,
@@ -289,6 +302,7 @@ export default {
 
         const {
             getPageData,
+            mapResponseData,
             openFormData,
             openFormEdit,
             postFormDelete,
@@ -310,6 +324,7 @@ export default {
             title,
 
             getPageData,
+            mapResponseData,
             openFormData,
             openFormEdit,
             postFormDelete,

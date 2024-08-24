@@ -53,7 +53,7 @@
 
         <v-sheet
             class="position-relative bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-            height="calc(100vh - 72px)"
+            height="calc(100dvh - 72px)"
             width="100%"
         >
             <div
@@ -91,28 +91,18 @@
             <v-sheet
                 :style="`max-width: ${maxWidth}`"
                 class="mt-9 pt-9 mx-auto"
-                min-height="calc(100vh - 175px)"
+                min-height="calc(100dvh - 175px)"
                 rounded="lg"
             >
-                <slot :record="record" :theme="theme"></slot>
+                <slot
+                    :combos="combos"
+                    :record="record"
+                    :theme="theme"
+                    :store="store"
+                ></slot>
             </v-sheet>
         </v-sheet>
     </v-sheet>
-
-    <!-- <v-card
-        class="overflow-hidden"
-        :color="`${theme}-lighten-5`"
-        height="calc(100vh - 72px)"
-        rounded="lg"
-    >
-        <v-card-text class="mx-auto" style="width: 500px">
-            <v-card rounded="lg">
-                <v-card-text>
-                    <slot :record="record"></slot>
-                </v-card-text>
-            </v-card>
-        </v-card-text>
-    </v-card> -->
 
     <form-help mode="edit" :withActivityLogs="withActivityLogs">
         <template v-slot:forminfo>
@@ -155,12 +145,21 @@ export default {
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
 
-        const { helpState, highlight, key, page, pageKey, record, theme } =
-            storeToRefs(store);
+        const {
+            combos,
+            helpState,
+            highlight,
+            key,
+            page,
+            pageKey,
+            record,
+            theme,
+        } = storeToRefs(store);
 
         const { getPageData, openFormData, postFormEdit } = store;
 
         return {
+            combos,
             helpState,
             highlight,
             key,
@@ -172,6 +171,8 @@ export default {
             getPageData,
             openFormData,
             postFormEdit,
+
+            store,
         };
     },
 

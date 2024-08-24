@@ -57,7 +57,7 @@
 
         <v-sheet
             class="position-relative bg-transparent overflow-x-hidden overflow-y-auto px-4"
-            height="calc(100vh - 72px)"
+            height="calc(100dvh - 72px)"
             width="100%"
         >
             <div

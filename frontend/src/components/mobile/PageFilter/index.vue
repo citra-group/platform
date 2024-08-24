@@ -1,34 +1,35 @@
 <template>
     <v-navigation-drawer
-        v-model="sidenavState"
         :color="`${theme}-lighten-4`"
         location="right"
         width="360"
+        v-model="sidenavState"
         disable-resize-watcher
+        style="height: 100%; top: 0; z-index: 1009"
     >
-        <v-sheet class="position-relative" color="transparent" height="100vh">
+        <v-sheet class="position-relative" color="transparent" height="100dvh">
             <v-toolbar :color="theme">
                 <v-btn icon @click="sidenavState = false">
                     <v-icon>close</v-icon>
                 </v-btn>
 
                 <v-toolbar-title class="text-white text-overline">
-                    {{ helpState ? "informasi" : "utilitas" }}
+                    {{ sidehelpState ? "informasi" : "utilitas" }}
                 </v-toolbar-title>
 
                 <v-spacer></v-spacer>
 
                 <v-btn
-                    :color="helpState ? 'white' : `${theme}-lighten-3`"
+                    :color="sidehelpState ? 'white' : `${theme}-lighten-3`"
                     icon
                     @click="
-                        helpState = !helpState;
-                        tabSidenav = helpState ? 'helpdesk' : 'filter';
+                        sidehelpState = !sidehelpState;
+                        tabSidenav = sidehelpState ? 'helpdesk' : 'filter';
                     "
                 >
                     <v-icon
                         :style="
-                            helpState
+                            sidehelpState
                                 ? 'transform: rotate(180deg)'
                                 : 'transform: rotate(0deg)'
                         "
@@ -49,47 +50,20 @@
             ></v-sheet>
 
             <v-responsive
-                height="calc(100vh - 64px)"
+                height="calc(100dvh - 64px)"
                 class="bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
                 content-class="position-relative"
             >
                 <div
-                    class="position-absolute text-center w-100 pt-1"
+                    class="position-absolute text-center w-100"
                     style="z-index: 1"
                 >
                     <div
                         class="d-flex flex-column align-center justify-center position-relative"
                     >
-                        <div
-                            :class="`text-${theme}`"
-                            class="d-flex justify-center position-relative w-100"
-                            style="z-index: 1"
-                        >
-                            <div class="circle position-absolute">
-                                <v-avatar size="56">
-                                    <v-icon :color="`${theme}-darken-1`">{{
-                                        helpState ? "menu_open" : "filter_list"
-                                    }}</v-icon>
-                                </v-avatar>
-                            </div>
-                        </div>
-                        <!-- <v-sheet
-                            :color="`${theme}`"
-                            elevation="4"
-                            rounded="pill"
-                        >
-                            <v-card-text class="pa-1">
-                                <v-avatar
-                                    :color="`${theme}-lighten-3`"
-                                    size="52"
-                                    style="font-size: 22px"
-                                >
-                                    <v-icon :color="`${theme}-darken-1`">{{
-                                        helpState ? "menu_open" : "filter_list"
-                                    }}</v-icon>
-                                </v-avatar>
-                            </v-card-text>
-                        </v-sheet> -->
+                        <form-icon
+                            :icon="sidehelpState ? 'menu_open' : 'filter_list'"
+                        ></form-icon>
 
                         <div
                             :class="`text-${theme}-lighten-4`"
@@ -112,9 +86,9 @@
                 </div>
 
                 <v-sheet
-                    class="mt-9 pt-7"
+                    class="mt-9 pt-7 overflow-hidden"
                     elevation="1"
-                    min-height="200px"
+                    min-height="calc(100dvh - 116px)"
                     rounded="lg"
                 >
                     <v-tabs-window
@@ -122,6 +96,23 @@
                         v-model="tabSidenav"
                     >
                         <v-tabs-window-item value="filter">
+                            <div
+                                v-if="withSync"
+                                class="text-overline text-grey-darken-3 px-4 mt-1"
+                            >
+                                <small>sync data</small>
+                            </div>
+
+                            <v-card-text class="flex-grow-1 pt-2 bg-white">
+                                <slot
+                                    name="syncdata"
+                                    :parent="parent"
+                                    :mapResponseData="mapResponseData"
+                                ></slot>
+                            </v-card-text>
+
+                            <v-divider v-if="withSync" class="my-2"></v-divider>
+
                             <div
                                 v-if="usetrash"
                                 class="text-overline text-grey-darken-3 px-4 mt-1"
@@ -344,6 +335,8 @@
                                     >
                                 </div>
 
+                                <slot name="helpdesk"></slot>
+
                                 <div class="text-overline mt-6">Utilitas</div>
                                 <v-divider></v-divider>
 
@@ -424,8 +417,6 @@
                                         </tr>
                                     </tbody>
                                 </table>
-
-                                <slot name="helpdesk"></slot>
 
                                 <div class="text-overline mt-6">Icon</div>
                                 <v-divider></v-divider>
@@ -560,30 +551,37 @@ import { storeToRefs } from "pinia";
 export default {
     name: "page-filter",
 
+    props: {
+        withSync: Boolean,
+    },
+
     setup() {
         const store = usePageStore();
 
         const {
             filters,
             hasSelected,
-            helpState,
+            sidehelpState,
             highlight,
             page,
             params,
+            parent,
             sidenavState,
             search,
             trashed,
             theme,
             usetrash,
         } = storeToRefs(store);
-        const { getPageDatas } = store;
+
+        const { getPageDatas, mapResponseData } = store;
 
         return {
             filters,
             hasSelected,
-            helpState,
+            sidehelpState,
             highlight,
             page,
+            parent,
             params,
             sidenavState,
             search,
@@ -592,6 +590,9 @@ export default {
             usetrash,
 
             getPageDatas,
+            mapResponseData,
+
+            store,
         };
     },
 

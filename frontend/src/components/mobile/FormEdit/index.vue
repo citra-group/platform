@@ -1,5 +1,9 @@
 <template>
-    <v-toolbar :color="theme">
+    <v-app-bar
+        :color="`${theme}`"
+        scroll-behavior="hide elevate"
+        scroll-threshold="64"
+    >
         <v-btn icon @click="openFormData">
             <v-icon class="with-shadow">arrow_back</v-icon>
         </v-btn>
@@ -36,83 +40,79 @@
                 >Informasi</v-tooltip
             >
         </v-btn>
-    </v-toolbar>
+    </v-app-bar>
 
     <v-sheet
         :color="`${theme}`"
-        class="mx-auto position-absolute w-100 rounded-b-xl"
-        height="192"
+        class="mx-auto position-fixed w-100 rounded-b-xl"
+        height="256"
     ></v-sheet>
 
-    <v-responsive
-        height="calc(100vh - 64px)"
-        class="bg-transparent overflow-x-hidden overflow-y-auto px-4"
-        content-class="position-relative"
-    >
-        <v-sheet
-            class="position-absolute text-center w-100 pt-1"
-            color="transparent"
-            style="z-index: 1"
-        >
-            <div class="d-flex justify-center position-relative">
-                <div
-                    :class="`text-${theme}`"
-                    class="d-flex justify-center position-relative w-100"
-                    style="z-index: 1"
-                >
-                    <div class="circle position-absolute">
-                        <v-avatar size="56">
-                            <v-icon :color="`${theme}-darken-1`">{{
-                                page.icon
-                            }}</v-icon>
-                        </v-avatar>
-                    </div>
-                </div>
+    <v-main>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
+            >
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
 
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
-                    style="
-                        font-size: 0.63rem !important;
-                        top: 8px;
-                        right: 0;
-                        width: calc(50% - 30px);
-                    "
-                >
                     <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
                     >
-                        edit: {{ record[key] }}
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            edit: {{ record[key] }}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </v-sheet>
+            </v-sheet>
 
-        <v-sheet
-            class="mt-9 pt-7"
-            elevation="1"
-            min-height="200px"
-            rounded="lg"
-        >
+            <v-sheet
+                class="position-relative pt-7"
+                elevation="1"
+                min-height="calc(100dvh - 172px)"
+                rounded="lg"
+                flat
+            >
+                <slot
+                    :combos="combos"
+                    :record="record"
+                    :theme="theme"
+                    :store="store"
+                ></slot>
+            </v-sheet>
+        </v-sheet>
+    </v-main>
+
+    <form-help mode="edit" :withActivityLogs="withActivityLogs">
+        <template v-slot:forminfo>
             <slot
-                :combos="combos"
+                name="forminfo"
                 :record="record"
                 :theme="theme"
                 :store="store"
             ></slot>
-        </v-sheet>
-
-        <div class="py-2"></div>
-    </v-responsive>
-
-    <form-help mode="edit" :withActivityLogs="withActivityLogs">
-        <template v-slot:forminfo>
-            <slot name="forminfo" :theme="theme"></slot>
         </template>
 
         <template v-slot:helpdesk>
-            <slot name="helpdesk" :theme="theme"></slot>
+            <slot
+                name="helpdesk"
+                :record="record"
+                :theme="theme"
+                :store="store"
+            ></slot>
         </template>
     </form-help>
 </template>
@@ -128,6 +128,7 @@ export default {
         beforePost: Function,
         hideUpdate: Boolean,
         dataFromStore: Boolean,
+        routePrefix: String,
         withHelpdesk: Boolean,
         withActivityLogs: Boolean,
     },
@@ -137,6 +138,7 @@ export default {
 
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
+        store.routePrefix = props.routePrefix;
 
         const {
             combos,

@@ -57,7 +57,7 @@
 
         <v-sheet
             class="position-relative bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-            height="calc(100vh - 72px)"
+            height="calc(100dvh - 72px)"
             width="100%"
         >
             <div
@@ -95,10 +95,15 @@
             <v-sheet
                 :style="`max-width: ${maxWidth}`"
                 class="mt-9 pt-9 mx-auto"
-                min-height="calc(100vh - 175px)"
+                min-height="calc(100dvh - 175px)"
                 rounded="lg"
             >
-                <slot :combos="combos" :record="record" :theme="theme"></slot>
+                <slot
+                    :combos="combos"
+                    :record="record"
+                    :theme="theme"
+                    :store="store"
+                ></slot>
             </v-sheet>
         </v-sheet>
     </v-sheet>
@@ -164,6 +169,8 @@ export default {
             getCreateData,
             openFormData,
             postFormCreate,
+
+            store,
         };
     },
 

@@ -1,8 +1,6 @@
 <template>
     <v-layout :class="`bg-${theme}-lighten-4`">
-        <v-main>
-            <router-view key="pagebase" />
-        </v-main>
+        <router-view key="pagebase" />
 
         <v-overlay
             :model-value="overlay"
@@ -20,7 +18,12 @@
             </v-progress-circular>
         </v-overlay>
 
-        <v-snackbar :color="snackbar.color" v-model="snackbar.state" multi-line>
+        <v-snackbar
+            :color="snackbar.color"
+            :timeout="1500"
+            v-model="snackbar.state"
+            multi-line
+        >
             {{ snackbar.text }}
 
             <template v-slot:actions>

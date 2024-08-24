@@ -71,7 +71,7 @@
                             class="d-flex w-100 text-grey-darken-1 pt-1"
                             style="font-size: 9px"
                         >
-                            <div style="min-width: 68px">
+                            <div class="text-truncate" style="min-width: 68px">
                                 {{ name }}
                             </div>
 
@@ -101,7 +101,7 @@
                             class="d-flex w-100 text-grey-darken-1 pt-1"
                             style="font-size: 9px"
                         >
-                            <div style="min-width: 68px">
+                            <div class="text-truncate" style="min-width: 68px">
                                 {{ name }}
                             </div>
 

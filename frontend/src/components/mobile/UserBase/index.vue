@@ -1,8 +1,6 @@
 <template>
     <v-layout :class="`bg-${theme}-lighten-4`">
-        <v-main>
-            <router-view key="userbase" />
-        </v-main>
+        <router-view key="userbase" />
 
         <v-overlay
             :model-value="overlay"
@@ -20,7 +18,12 @@
             </v-progress-circular>
         </v-overlay>
 
-        <v-snackbar :color="snackbar.color" v-model="snackbar.state" multi-line>
+        <v-snackbar
+            :color="snackbar.color"
+            :timeout="1500"
+            v-model="snackbar.state"
+            multi-line
+        >
             {{ snackbar.text }}
 
             <template v-slot:actions>
@@ -40,15 +43,15 @@
             :color="`${theme}-darken-1`"
         >
             <v-btn
-                v-for="(item, index) in appsMenus"
+                v-for="(page, index) in appsMenus"
                 :key="index"
                 style="width: 25%"
-                :to="{ name: item.slug }"
+                :to="{ name: page.slug }"
             >
-                <v-icon>{{ item.icon }}</v-icon>
+                <v-icon>{{ page.icon }}</v-icon>
 
                 <div style="margin-top: 2px; font-size: 88%">
-                    {{ item.name }}
+                    {{ page.name }}
                 </div>
             </v-btn>
         </v-bottom-navigation>
@@ -107,6 +110,12 @@ export default {
         }
 
         this.initModule({ mobile: true });
+    },
+
+    mounted() {
+        // setTimeout(() => {
+        //     console.log(this.$refs.apps.getLayoutItem("bottom"));
+        // }, 500);
     },
 };
 </script>

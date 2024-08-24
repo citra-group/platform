@@ -1,8 +1,9 @@
-import "./material-design-icons.css";
 import "vuetify/styles";
 
+import { h } from "vue";
 import { createVuetify } from "vuetify";
-import { aliases, md } from "vuetify/iconsets/md";
+import { VLigatureIcon } from "vuetify/components";
+import { aliases } from "vuetify/iconsets/md";
 import { VDateInput } from "vuetify/labs/VDateInput";
 import { VNumberInput } from "vuetify/labs/VNumberInput";
 
@@ -16,7 +17,13 @@ export default createVuetify({
         defaultSet: "md",
         aliases,
         sets: {
-            md,
+            md: {
+                component: (props) =>
+                    h(VLigatureIcon, {
+                        ...props,
+                        class: "material-symbols-outlined",
+                    }),
+            },
         },
     },
 });

@@ -3,14 +3,14 @@
         v-model="sidenavState"
         color="transparent"
         location="right"
-        style="height: calc(100vh - 8px); padding-right: 4px"
+        style="height: calc(100dvh - 8px); padding-right: 4px"
         width="356"
         disable-resize-watcher
     >
         <v-sheet
             class="overflow-hidden position-relative"
             color="transparent"
-            height="calc(100vh - 8px)"
+            height="calc(100dvh - 8px)"
             rounded="lg"
         >
             <v-toolbar :color="theme">
@@ -54,7 +54,7 @@
 
             <v-sheet
                 class="position-relative bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-                height="calc(100vh - 72px)"
+                height="calc(100dvh - 72px)"
                 width="100%"
             >
                 <div

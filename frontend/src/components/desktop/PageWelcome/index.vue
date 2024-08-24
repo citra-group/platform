@@ -32,7 +32,7 @@
                     style="position: absolute; left: 0; top: 0; z-index: 1"
                 />
 
-                <img src="/assets/pngegg.png" style="height: 75vh" />
+                <img src="/assets/pngegg.png" style="height: 75dvh" />
             </div>
         </div>
     </v-main>

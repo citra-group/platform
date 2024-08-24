@@ -4,7 +4,7 @@
 
         <v-navigation-drawer
             color="transparent"
-            style="height: calc(100vh - 8px); padding-left: 4px"
+            style="height: calc(100dvh - 8px); padding-left: 4px"
             rail-width="60"
             disable-resize-watcher
             permanent
@@ -83,7 +83,7 @@
             <div
                 :class="`bg-transparent`"
                 class="rounded-lg overflow-hidden"
-                style="height: calc(100vh - 8px); width: calc(100% - 4px)"
+                style="height: calc(100dvh - 8px); width: calc(100% - 4px)"
             >
                 <router-view key="pagebase" />
             </div>
