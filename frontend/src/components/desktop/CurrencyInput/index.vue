@@ -28,7 +28,8 @@ export default {
     },
 
     setup(props) {
-        const valueRange = { min: 0 };
+        let valueRange = { min: 0 };
+        let precision = 0;
 
         if (props.minRange) {
             valueRange["min"] = parseInt(props.minRange);
@@ -38,6 +39,10 @@ export default {
             valueRange["max"] = parseInt(props.maxRange);
         }
 
+        if (props.precision) {
+            precision = parseInt(props.precision);
+        }
+
         const { formattedValue, numberValue, inputRef, setValue } =
             useCurrencyInput({
                 currency: "IDR",
@@ -45,7 +50,7 @@ export default {
                 autoDecimalDigits: true,
                 currencyDisplay: "hidden",
                 hideGroupingSeparatorOnFocus: false,
-                precision: parseInt(props.precision),
+                precision: precision,
                 valueRange: valueRange,
             });
 
