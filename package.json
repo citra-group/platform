@@ -11,10 +11,11 @@
 		"axios": "^1.6.8",
 		"core-js": "^3.34.0",
 		"debounce": "^2.1.0",
-    	"pdfjs-dist": "4.5.136",
+		"pdfjs-dist": "4.5.136",
 		"pinia": "^2.1.7",
 		"roboto-fontface": "*",
 		"vue": "^3.4.0",
+		"vue-currency-input": "^3.1.0",
 		"vuetify": "^3.5.0"
 	},
 	"devDependencies": {
