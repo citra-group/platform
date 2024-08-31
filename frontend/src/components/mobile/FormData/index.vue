@@ -120,7 +120,6 @@
                 >
                     <template v-for="(record, index) in records">
                         <slot
-                            name="mobile"
                             :index="index"
                             :record="record"
                             :showDelete="showDelete"
@@ -136,7 +135,7 @@
                     </template>
 
                     <template v-if="records.length <= 0">
-                        <slot>
+                        <slot name="not-found">
                             <div
                                 class="d-flex align-center justify-center text-body-2 text-center text-grey"
                                 style="height: calc(100dvh - 216px)"
