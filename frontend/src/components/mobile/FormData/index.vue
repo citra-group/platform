@@ -2,14 +2,14 @@
     <v-app-bar
         :color="`${theme}`"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-btn
             icon
-            v-if="parentName"
+            v-if="parentName || navbackTo"
             @click="
-                manualBacknav
-                    ? $emit('click:backnav', $event)
+                navbackTo
+                    ? $router.push({ name: navbackTo })
                     : $router.push({ name: parentName })
             "
         >
@@ -97,14 +97,18 @@
             </v-sheet>
 
             <v-sheet
+                :min-height="
+                    parentName || navbackTo
+                        ? `calc(100dvh - 116px)`
+                        : `calc(100dvh - 172px)`
+                "
                 class="position-relative pt-7"
                 elevation="1"
-                min-height="calc(100dvh - 172px)"
                 rounded="lg"
                 flat
             >
                 <v-list
-                    class="bg-transparent"
+                    class="bg-transparent overflow-y-auto overflow-x-hidden scrollbar-none"
                     :active-class="
                         showDelete
                             ? `bg-white elevation-6 text-grey with-delete`
@@ -142,16 +146,13 @@
                         </slot>
                     </template>
 
-                    <template v-else>
-                        <div
-                            v-if="
-                                meta.current_page &&
-                                meta.current_page < meta.last_page
-                            "
-                            class="d-flex align-center justify-center py-2"
-                            style="height: 0px; width: 100%"
-                            v-intersect="onIntersect"
-                        ></div>
+                    <template
+                        v-if="
+                            meta.current_page &&
+                            meta.current_page < meta.last_page
+                        "
+                    >
+                        <v-list-item v-intersect="onIntersect"></v-list-item>
                     </template>
                 </v-list>
             </v-sheet>
@@ -192,13 +193,14 @@ export default {
     name: "form-data",
 
     props: {
+        navbackTo: String,
+
         chip: {
             type: String,
             default: "chip",
         },
 
         disableCreate: Boolean,
-        manualBacknav: Boolean,
 
         subtitle: {
             type: String,
@@ -213,14 +215,14 @@ export default {
         withSync: Boolean,
     },
 
-    emits: {
-        "click:backnav": null,
-    },
-
-    setup() {
+    setup(props) {
         const store = usePageStore();
 
         store.helpState = false;
+
+        if (store.parentName || props.navbackTo) {
+            store.navigationState = false;
+        }
 
         const {
             formStateLast,
@@ -277,6 +279,12 @@ export default {
 
             store,
         };
+    },
+
+    beforeUnmount() {
+        if (this.parentName || this.navbackTo) {
+            this.navigationState = true;
+        }
     },
 
     methods: {

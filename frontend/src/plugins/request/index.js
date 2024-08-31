@@ -105,8 +105,10 @@ export function RequestInstance(url, options) {
      * construct the request
      */
     let request = null;
+    let htmlTag = document.getElementsByTagName("html");
 
     store.overlay = true;
+    htmlTag[0].style.overflowY = "hidden";
 
     switch (defaultOptions.method) {
         case "DELETE":
@@ -153,6 +155,7 @@ export function RequestInstance(url, options) {
     return request
         .then((response) => {
             store.overlay = false;
+            htmlTag[0].style.overflowY = "scroll";
 
             let { status, message } = response.data;
 
@@ -166,6 +169,7 @@ export function RequestInstance(url, options) {
         })
         .catch((error) => {
             store.overlay = false;
+            htmlTag[0].style.overflowY = "scroll";
 
             let status = error.response ? error.response.status : error.status;
 

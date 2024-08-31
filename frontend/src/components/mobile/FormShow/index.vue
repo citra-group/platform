@@ -2,12 +2,12 @@
     <v-app-bar
         :color="`${theme}`"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-btn
             icon
             @click="
-                manualBacknav ? $emit('click:backnav', $event) : openFormData()
+                navbackTo ? $router.push({ name: navbackTo }) : openFormData()
             "
         >
             <v-icon class="with-shadow">arrow_back</v-icon>
@@ -24,9 +24,7 @@
                 <v-icon class="with-shadow">restore</v-icon>
 
                 <form-confirm icon="restore" title="pulihkan">
-                    <v-card-text>
-                        Proses ini akan memulihkan data ini dari status trashed.
-                    </v-card-text>
+                    Proses ini akan memulihkan data ini dari status trashed.
 
                     <template v-slot:actions="{ isActive }">
                         <v-spacer></v-spacer>
@@ -54,10 +52,8 @@
                 <v-icon class="with-shadow">delete_forever</v-icon>
 
                 <form-confirm icon="delete_forever" title="Hapus Permanen?">
-                    <v-card-text>
-                        Proses ini akan menghapus data secara permanen, proses
-                        ini tidak dapat di pulihkan setelah di lakukan.
-                    </v-card-text>
+                    Proses ini akan menghapus data secara permanen, proses ini
+                    tidak dapat di pulihkan setelah di lakukan.
 
                     <template v-slot:actions="{ isActive }">
                         <v-spacer></v-spacer>
@@ -95,10 +91,8 @@
                 <v-icon class="with-shadow">delete</v-icon>
 
                 <form-confirm icon="delete" title="Hapus data ini?">
-                    <div class="text-caption text-grey-darken-1">
-                        Proses ini akan juga menghapus semua data yang terkait
-                        pada data ini.
-                    </div>
+                    Proses ini akan juga menghapus semua data yang terkait pada
+                    data ini.
 
                     <template v-slot:actions="{ isActive }">
                         <v-row dense>
@@ -218,7 +212,7 @@
             <v-sheet
                 class="position-relative pt-7"
                 elevation="1"
-                min-height="calc(100dvh - 172px)"
+                min-height="calc(100dvh - 116px)"
                 rounded="lg"
                 flat
             >
@@ -265,7 +259,7 @@ export default {
         hideEdit: Boolean,
         hideDataTag: Boolean,
         hideDelete: Boolean,
-        manualBacknav: Boolean,
+        navbackTo: String,
         routePrefix: String,
         width: {
             type: String,
@@ -275,16 +269,13 @@ export default {
         withActivityLogs: Boolean,
     },
 
-    emits: {
-        "click:backnav": null,
-    },
-
     setup(props) {
         const store = usePageStore();
 
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
         store.routePrefix = props.routePrefix;
+        store.navigationState = false;
 
         const {
             combos,
@@ -337,6 +328,10 @@ export default {
 
     mounted() {
         this.getPageData(this.dataFromStore);
+    },
+
+    beforeUnmount() {
+        this.navigationState = true;
     },
 };
 </script>

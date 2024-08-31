@@ -7,11 +7,18 @@
                         icon
                     }}</v-icon>
 
-                    <div class="text-subtitle-1 font-weight-medium mt-2">
+                    <div
+                        class="text-caption text-subtitle-1 font-weight-medium my-1"
+                    >
                         {{ title }}
                     </div>
 
-                    <slot></slot>
+                    <div
+                        class="text-grey-darken-1"
+                        style="line-height: 1.15rem"
+                    >
+                        <slot></slot>
+                    </div>
                 </v-card-text>
 
                 <v-card-text class="pt-0">

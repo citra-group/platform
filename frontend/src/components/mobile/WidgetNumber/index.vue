@@ -1,10 +1,5 @@
 <template>
-    <v-sheet
-        :class="vertical ? 'flex-colum' : null"
-        color="grey-lighten-5"
-        class="d-flex align-center justify-center pa-3 border-thin"
-        rounded
-    >
+    <widget-card>
         <v-avatar :color="`${color}-lighten-5`" size="40">
             <v-icon :color="color">{{ icon }}</v-icon>
         </v-avatar>
@@ -23,7 +18,7 @@
                 {{ label }}
             </div>
         </div>
-    </v-sheet>
+    </widget-card>
 </template>
 
 <script>

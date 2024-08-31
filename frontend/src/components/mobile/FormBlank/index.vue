@@ -2,14 +2,14 @@
     <v-app-bar
         :color="`${theme}`"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-btn
             icon
-            v-if="parentName"
+            v-if="parentName || navbackTo"
             @click="
-                manualBacknav
-                    ? $emit('click:backnav', $event)
+                navbackTo
+                    ? $router.push({ name: navbackTo })
                     : $router.push({ name: parentName })
             "
         >
@@ -84,7 +84,7 @@
             <v-sheet
                 class="position-relative pt-7"
                 elevation="1"
-                min-height="calc(100dvh - 172px)"
+                min-height="calc(100dvh - 116px)"
                 rounded="lg"
                 flat
             >
@@ -130,7 +130,7 @@ export default {
         dataFromStore: Boolean,
         hideEdit: Boolean,
         hideDelete: Boolean,
-        manualBacknav: Boolean,
+        navbackTo: String,
         title: String,
         width: {
             type: String,
@@ -140,15 +140,12 @@ export default {
         withActivityLogs: Boolean,
     },
 
-    emits: {
-        "click:backnav": null,
-    },
-
     setup(props) {
         const store = usePageStore();
 
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
+        store.navigationState = false;
 
         const {
             combos,
@@ -183,6 +180,10 @@ export default {
 
     mounted() {
         this.getPageData();
+    },
+
+    beforeUnmount() {
+        this.navigationState = true;
     },
 };
 </script>

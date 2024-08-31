@@ -2,7 +2,7 @@
     <v-app-bar
         :color="theme"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-btn icon v-if="parentName">
             <v-icon>arrow_back</v-icon>

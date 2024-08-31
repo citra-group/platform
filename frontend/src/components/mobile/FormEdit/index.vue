@@ -2,9 +2,14 @@
     <v-app-bar
         :color="`${theme}`"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
-        <v-btn icon @click="openFormData">
+        <v-btn
+            icon
+            @click="
+                navbackTo ? $router.push({ name: navbackTo }) : openFormData()
+            "
+        >
             <v-icon class="with-shadow">arrow_back</v-icon>
         </v-btn>
 
@@ -82,7 +87,7 @@
             <v-sheet
                 class="position-relative pt-7"
                 elevation="1"
-                min-height="calc(100dvh - 172px)"
+                min-height="calc(100dvh - 116px)"
                 rounded="lg"
                 flat
             >
@@ -128,6 +133,7 @@ export default {
         beforePost: Function,
         hideUpdate: Boolean,
         dataFromStore: Boolean,
+        navbackTo: String,
         routePrefix: String,
         withHelpdesk: Boolean,
         withActivityLogs: Boolean,
@@ -139,12 +145,14 @@ export default {
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
         store.routePrefix = props.routePrefix;
+        store.navigationState = false;
 
         const {
             combos,
             helpState,
             highlight,
             key,
+            navigationState,
             page,
             pageKey,
             record,
@@ -158,6 +166,7 @@ export default {
             helpState,
             highlight,
             key,
+            navigationState,
             page,
             pageKey,
             record,
@@ -173,6 +182,10 @@ export default {
 
     mounted() {
         this.getPageData(this.dataFromStore);
+    },
+
+    beforeUnmount() {
+        this.navigationState = true;
     },
 };
 </script>

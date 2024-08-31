@@ -2,7 +2,7 @@
     <v-app-bar
         :color="`${theme}`"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-btn icon @click="openFormData">
             <v-icon class="with-shadow">arrow_back</v-icon>
@@ -82,7 +82,7 @@
             <v-sheet
                 class="position-relative pt-7"
                 elevation="1"
-                min-height="calc(100dvh - 172px)"
+                min-height="calc(100dvh - 116px)"
                 rounded="lg"
                 flat
             >
@@ -95,56 +95,6 @@
             </v-sheet>
         </v-sheet>
     </v-main>
-
-    <!-- <v-responsive
-        height="calc(100dvh - 64px)"
-        class="bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-        content-class="position-relative"
-    >
-        <v-sheet
-            class="position-absolute text-center w-100"
-            color="transparent"
-            style="z-index: 1"
-        >
-            <div class="d-flex justify-center position-relative">
-                <form-icon></form-icon>
-
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
-                    style="
-                        font-size: 0.63rem !important;
-                        top: 8px;
-                        right: 0;
-                        width: calc(50% - 30px);
-                    "
-                >
-                    <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
-                    >
-                        create
-                    </div>
-                </div>
-            </div>
-        </v-sheet>
-
-        <v-sheet
-            class="mt-9 pt-9"
-            elevation="1"
-            min-height="200px"
-            rounded="lg"
-        >
-            <slot
-                :combos="combos"
-                :record="record"
-                :theme="theme"
-                :store="store"
-            ></slot>
-        </v-sheet>
-
-        <div class="py-2"></div>
-    </v-responsive> -->
 
     <form-help mode="create" :withActivityLogs="false">
         <template v-slot:forminfo>
@@ -180,9 +130,18 @@ export default {
 
         store.beforePost = props.beforePost;
         store.activityLog = false;
+        store.navigationState = false;
 
-        const { combos, helpState, highlight, page, pageKey, record, theme } =
-            storeToRefs(store);
+        const {
+            combos,
+            helpState,
+            highlight,
+            navigationState,
+            page,
+            pageKey,
+            record,
+            theme,
+        } = storeToRefs(store);
 
         const { getCreateData, openFormData, postFormCreate } = store;
 
@@ -190,6 +149,7 @@ export default {
             combos,
             helpState,
             highlight,
+            navigationState,
             page,
             pageKey,
             record,
@@ -205,6 +165,10 @@ export default {
 
     mounted() {
         this.getCreateData();
+    },
+
+    beforeUnmount() {
+        this.navigationState = true;
     },
 };
 </script>

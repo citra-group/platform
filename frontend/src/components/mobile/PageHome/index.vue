@@ -2,7 +2,7 @@
     <v-app-bar
         :color="theme"
         scroll-behavior="hide elevate"
-        scroll-threshold="64"
+        scroll-threshold="87"
     >
         <v-toolbar-title class="text-body-2 font-weight-bold text-uppercase">{{
             module.name
