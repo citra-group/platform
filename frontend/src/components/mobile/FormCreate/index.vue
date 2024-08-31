@@ -80,7 +80,8 @@
             </v-sheet>
 
             <v-sheet
-                class="position-relative pt-7"
+                :class="`pt-${paddingTop ?? '0'}`"
+                class="position-relative"
                 elevation="1"
                 min-height="calc(100dvh - 116px)"
                 rounded="lg"
@@ -118,6 +119,7 @@ export default {
         beforePost: Function,
         contentClass: String,
         hideSave: Boolean,
+        paddingTop: String,
         width: {
             type: String,
             default: "500px",
