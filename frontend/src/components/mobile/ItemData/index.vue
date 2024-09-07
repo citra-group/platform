@@ -1,5 +1,8 @@
 <template>
-    <div class="v-list-wrap position-relative overflow-hidden">
+    <div
+        :class="`${buttons}-buttons`"
+        class="v-list-wrap position-relative overflow-hidden"
+    >
         <v-list-item
             class="bg-white"
             :ripple="false"
@@ -56,6 +59,8 @@
         >
             <v-spacer></v-spacer>
 
+            <slot></slot>
+
             <v-btn
                 :color="`${theme}`"
                 size="small"
@@ -91,6 +96,11 @@ export default {
     name: "item-data",
 
     props: {
+        buttons: {
+            type: String,
+            default: "one",
+        },
+
         chip: {
             type: String,
             default: "chip",

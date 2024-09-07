@@ -112,11 +112,11 @@ html {
     background-color: transparent;
 }
 
-.v-list > .v-list-wrap > .v-list-item.v-list-item--active {
+.v-list > .v-list-wrap.one-buttons > .v-list-item.v-list-item--active {
     transform: translateX(-72px);
 }
 
-.v-list > .v-list-wrap > .v-list-item.v-list-item--active.with-delete {
+.v-list > .v-list-wrap.two-buttons > .v-list-item.v-list-item--active {
     transform: translateX(-128px);
 }
 

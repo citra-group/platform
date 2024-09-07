@@ -43,9 +43,6 @@ class ModularServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        /** ADD MIDDLEWARE */
-        $this->app->router->pushMiddlewareToGroup('api', Impersonate::class);
-
         /** Disable wrapping of the outer-most resource array. */
         JsonResource::withoutWrapping();
 
