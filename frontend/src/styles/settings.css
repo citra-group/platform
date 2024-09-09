@@ -61,6 +61,16 @@ html {
     width: 0px;
 }
 
+.v-card--reveal {
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    justify-content: center;
+    opacity: 1;
+    position: absolute;
+    width: 100%;
+}
+
 .v-data-table-footer {
     justify-content: flex-start;
     padding-left: 16px;
