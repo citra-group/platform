@@ -20,10 +20,14 @@
             page.name ?? module.name
         }}</v-toolbar-title>
 
-        <v-spacer></v-spacer>
+        <slot name="toolbar" :statuses="statuses" :theme="theme" :store="store">
+            <v-btn icon>
+                <v-icon>home</v-icon>
+            </v-btn>
+        </slot>
 
         <v-btn
-            v-if="!disableCreate && !hasSelected"
+            v-if="!hideCreate && !hasSelected"
             :color="highlight"
             icon
             @click="openFormCreate"
@@ -199,7 +203,7 @@ export default {
             default: "chip",
         },
 
-        disableCreate: Boolean,
+        hideCreate: Boolean,
 
         subtitle: {
             type: String,
@@ -239,6 +243,7 @@ export default {
             parentName,
             records,
             railMode,
+            statuses,
             sidenavState,
             selected,
             title,
@@ -265,6 +270,7 @@ export default {
             parentName,
             records,
             railMode,
+            statuses,
             sidenavState,
             selected,
             title,
