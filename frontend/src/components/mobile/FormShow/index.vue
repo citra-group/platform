@@ -238,6 +238,7 @@
                 :mapResponseData="mapResponseData"
                 :record="record"
                 :theme="theme"
+                :statuses="statuses"
                 :store="store"
             ></slot>
         </template>
@@ -285,6 +286,7 @@ export default {
             navigationState,
             page,
             pageKey,
+            statuses,
             softdelete,
             record,
             theme,
@@ -310,6 +312,7 @@ export default {
             page,
             pageKey,
             record,
+            statuses,
             softdelete,
             theme,
             title,
