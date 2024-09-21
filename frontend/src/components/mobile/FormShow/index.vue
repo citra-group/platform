@@ -131,6 +131,14 @@
             </v-btn>
         </template>
 
+        <slot
+            name="toolbar"
+            :record="record"
+            :theme="theme"
+            :statuses="statuses"
+            :store="store"
+        ></slot>
+
         <v-btn
             v-if="withHelpdesk"
             :color="helpState ? 'white' : `${theme}-lighten-3`"
