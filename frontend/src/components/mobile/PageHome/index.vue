@@ -179,11 +179,9 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { getDashboard } = store;
+        const { clearFilters, getDashboard } = store;
 
         return {
-            getDashboard,
-
             auth,
             highlight,
             module,
@@ -195,6 +193,10 @@ export default {
             dockMenus,
             statuses,
             theme,
+
+            clearFilters,
+            getDashboard,
+            store,
         };
     },
 
@@ -206,10 +208,14 @@ export default {
 
     methods: {
         gotoAccountService: function () {
+            this.clearFilters();
+
             this.$router.push({ name: "account-module" });
         },
 
         openPage: function (page) {
+            this.clearFilters();
+
             this.$router.push({ name: page.slug });
         },
     },

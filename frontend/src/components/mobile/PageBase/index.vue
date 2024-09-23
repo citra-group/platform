@@ -46,7 +46,7 @@
                 v-for="(item, index) in sideMenus"
                 :key="index"
                 style="width: 25%"
-                :to="{ name: item.slug }"
+                @click="openPage(item)"
             >
                 <v-icon>{{ item.icon }}</v-icon>
 
@@ -100,23 +100,33 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { initModule } = store;
+        const { clearFilters, initModule } = store;
 
         return {
             auth,
             dockMenus,
-            initModule,
             navigationState,
             overlay,
             railMode,
             sideMenus,
             snackbar,
             theme,
+
+            clearFilters,
+            initModule,
         };
     },
 
     created() {
         this.initModule({ mobile: true });
+    },
+
+    methods: {
+        openPage: function (page) {
+            this.clearFilters();
+
+            this.$router.push({ name: page.slug });
+        },
     },
 };
 </script>
