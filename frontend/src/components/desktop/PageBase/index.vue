@@ -134,17 +134,19 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { initModule } = store;
+        const { clearFilters, initModule } = store;
 
         return {
             auth,
             dockMenus,
-            initModule,
             overlay,
             railMode,
             sideMenus,
             snackbar,
             theme,
+
+            clearFilters,
+            initModule,
         };
     },
 
