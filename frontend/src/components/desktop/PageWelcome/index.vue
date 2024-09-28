@@ -1,63 +1,104 @@
 <template>
-    <v-main>
-        <div class="d-flex h-100">
-            <div
-                class="d-flex flex-column align-center justify-center pl-6"
-                style="width: 500px"
-            >
-                <div
-                    class="d-flex flex-column flex-grow-1 align-center justify-center"
-                >
-                    <div class="text-h6">Selamat datang di</div>
+	<v-layout :class="`bg-blue-grey-lighten-5`">
+		<v-main class="position-relative welcome-page playing">
+			<div class="wave"></div>
+			<div class="wave"></div>
+			<div class="wave"></div>
 
-                    <div class="text-h3 font-brand mt-1">
-                        MONO<span class="text-red">TECH</span>
-                    </div>
+			<v-container
+				class="d-flex align-center justify-center"
+				style="min-height: 100dvh"
+			>
+				<v-sheet
+					color="transparent"
+					max-width="840"
+					width="100%"
+				>
+					<v-sheet
+						color="rgba(255,255,255,0.95)"
+						class="position-relative pa-8"
+						rounded="xl"
+						width="100%"
+						style="padding-top: 112px !important"
+					>
+						<div
+							class="position-absolute d-flex align-center"
+							style="top: 24px"
+						>
+							<img
+								src="/assets/pwa-76x76.png"
+								style="margin-left: -2px"
+							/>
 
-                    <slot
-                        :authenticate="authenticate"
-                        :challenge="challenge"
-                    ></slot>
-                </div>
+							<div class="ml-2 text-h4 font-brand">
+								SiMAS<span class="sub-color">TEN</span>
+							</div>
+						</div>
 
-                <div class="text-overline"><small>versi 3.0</small></div>
-            </div>
+						<slot
+							:authenticate="authenticate"
+							:challenge="challenge"
+							:finduser="finduser"
+							:resetpass="resetpass"
+						></slot>
+					</v-sheet>
+				</v-sheet>
 
-            <div
-                class="d-flex align-center justify-center flex-grow-1 bg-blue-grey-lighten-3 position-relative"
-            >
-                <img
-                    class="mt-auto h-100"
-                    src="/assets/waves-haikei-left-1.svg"
-                    style="position: absolute; left: 0; top: 0; z-index: 1"
-                />
-
-                <img src="/assets/pngegg.png" style="height: 75dvh" />
-            </div>
-        </div>
-    </v-main>
+				<v-sheet
+					color="transparent"
+					class="position-absolute w-100"
+					style="bottom: 0px"
+				>
+					<v-row no-gutters>
+						<v-col cols="12">
+							<div
+								class="d-flex justify-center text-grey-darken-1 pb-2"
+							>
+								<div class="text-caption text-uppercase">
+									version 3.0.0
+								</div>
+								<div class="ml-4 text-caption text-uppercase">
+									Datin BKD &copy; 2024
+								</div>
+							</div>
+						</v-col>
+					</v-row>
+				</v-sheet>
+			</v-container>
+		</v-main>
+	</v-layout>
 </template>
 
 <script>
 import { usePageStore } from "@pinia/pageStore";
 
 export default {
-    name: "PageWelcome",
+	name: "PageWelcome",
 
-    setup() {
-        const store = usePageStore();
+	setup() {
+		const store = usePageStore();
 
-        const { authenticate, challenge, getSanctumCSRF } = store;
+		const {
+			authenticate,
+			challenge,
+			finduser,
+			getSanctumCSRF,
+			resetpass,
+			theme,
+		} = store;
 
-        return {
-            authenticate,
-            challenge,
-            getSanctumCSRF,
-        };
-    },
+		return {
+			authenticate,
+			challenge,
+			finduser,
+			getSanctumCSRF,
+			resetpass,
+			theme,
+		};
+	},
 
-    created() {
-        this.getSanctumCSRF({ mobile: false });
-    },
+	created() {
+		this.getSanctumCSRF({ mobile: false });
+	},
 };
 </script>

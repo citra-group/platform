@@ -178,28 +178,57 @@
 				v-model="dialogSync"
 				max-width="340"
 			>
-				<v-card
-					prepend-icon="sync"
-					text="Proses sync dokumen akan mengambil data dari server SiASN dan menyimpan dokumen ke server SiMASTEN."
-					title="Sync Dokumen?"
+				<v-sheet
+					elevation="9"
+					rounded="lg"
 				>
-					<template v-slot:actions>
-						<v-btn
-							class="text-grey-darken-1"
-							text="Tutup"
-							@click="dialogSync = false"
-						></v-btn>
+					<v-card-text class="text-center">
+						<v-icon class="v-icon--size-dialog text-blue-grey"
+							>cloud_sync</v-icon
+						>
 
-						<v-btn
-							class="text-blue"
-							text="Proses"
-							@click="
-								dialogSync = false;
-								$emit('click:sync', $event);
-							"
-						></v-btn>
-					</template>
-				</v-card>
+						<div class="text-subtitle-1 font-weight-medium my-1">
+							Sync Ulang Dokumen
+						</div>
+
+						<div
+							class="text-caption text-grey-darken-1"
+							style="line-height: 1.15rem"
+						>
+							Proses sync dokumen akan mengambil data dari server
+							SiASN dan menyimpan dokumen ke server SiMASTEN.
+						</div>
+					</v-card-text>
+
+					<v-card-text class="pt-0">
+						<v-row dense>
+							<v-col cols="6">
+								<v-btn
+									:color="theme"
+									rounded="pill"
+									variant="outlined"
+									block
+									@click="dialogSync = false"
+									>BATAL</v-btn
+								>
+							</v-col>
+
+							<v-col cols="6">
+								<v-btn
+									:color="theme"
+									rounded="pill"
+									variant="flat"
+									block
+									@click="
+										dialogSync = false;
+										$emit('click:sync', $event);
+									"
+									>SYNC</v-btn
+								>
+							</v-col>
+						</v-row>
+					</v-card-text>
+				</v-sheet>
 			</v-dialog>
 
 			<v-dialog
@@ -289,11 +318,12 @@ export default {
 	setup() {
 		const store = usePageStore();
 
-		const { currentFile, dialogFile } = storeToRefs(store);
+		const { currentFile, dialogFile, theme } = storeToRefs(store);
 
 		return {
 			currentFile,
 			dialogFile,
+			theme,
 		};
 	},
 

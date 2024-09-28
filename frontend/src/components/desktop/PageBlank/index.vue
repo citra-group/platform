@@ -1,91 +1,58 @@
 <template>
-    <v-sheet color="transparent" class="position-relative">
-        <v-toolbar :color="theme">
-            <v-app-bar-nav-icon
-                @click="railMode = !railMode"
-            ></v-app-bar-nav-icon>
+	<v-app-bar
+		:color="`${theme}-lighten-5`"
+		:order="1"
+		height="72"
+		scroll-behavior="elevate"
+		scroll-threshold="87"
+	>
+		<v-btn
+			icon
+			v-if="parentName || navbackTo"
+			@click="
+				navbackTo
+					? $router.push({ name: navbackTo })
+					: $router.push({ name: parentName })
+			"
+		>
+			<v-icon>arrow_back</v-icon>
+		</v-btn>
 
-            <v-toolbar-title
-                class="text-body-2 font-weight-bold text-uppercase"
-                >{{ module.name }}</v-toolbar-title
-            >
+		<v-app-bar-nav-icon
+			v-else
+			@click="railMode = !railMode"
+		></v-app-bar-nav-icon>
 
-            <v-spacer></v-spacer>
+		<v-toolbar-title class="text-body-2 font-weight-bold text-uppercase">{{
+			page.name
+		}}</v-toolbar-title>
 
-            <slot name="toolbar"></slot>
+		<v-spacer></v-spacer>
 
-            <v-btn
-                v-if="withProperty"
-                icon
-                @click="sidenavState = !sidenavState"
-            >
-                <v-icon>{{ sidenavState ? "close" : "filter_list" }}</v-icon>
-            </v-btn>
-        </v-toolbar>
+		<slot name="toolbar"></slot>
 
-        <v-sheet
-            :color="`${theme}-lighten-4`"
-            class="mx-auto position-absolute w-100"
-            height="100%"
-        ></v-sheet>
+		<v-btn
+			v-if="showSidenav"
+			icon
+			@click="sidenavState = !sidenavState"
+		>
+			<v-icon>{{ sidenavState ? "close" : "tune" }}</v-icon>
+		</v-btn>
+	</v-app-bar>
 
-        <v-sheet
-            :color="`${theme}`"
-            class="mx-auto position-absolute w-100 rounded-b-xl"
-            height="192"
-        ></v-sheet>
+	<page-sidenav :title="sidenavTitle"></page-sidenav>
 
-        <v-sheet
-            class="position-relative bg-transparent overflow-x-hidden overflow-y-auto px-4 scrollbar-none"
-            height="calc(100dvh - 72px)"
-            width="100%"
-        >
-            <div
-                class="position-absolute text-center"
-                style="width: calc(100% - 32px); z-index: 1"
-            >
-                <div
-                    class="d-flex flex-column align-center justify-center position-relative mx-auto"
-                    :style="`max-width: ${maxWidth}`"
-                >
-                    <v-card :color="`${theme}`" rounded="pill">
-                        <v-card-text class="pa-1">
-                            <v-avatar
-                                :color="`${theme}-lighten-2`"
-                                size="64"
-                                style="font-size: 22px"
-                            >
-                                <v-icon :color="`${theme}-darken-1`">{{
-                                    page.icon
-                                }}</v-icon>
-                            </v-avatar>
-                        </v-card-text>
-                    </v-card>
-
-                    <div
-                        :class="`text-${theme}-lighten-4`"
-                        class="text-caption text-white position-absolute py-1 font-weight-bold text-uppercase"
-                        style="top: 0; right: 0"
-                    >
-                        {{ page.name }}
-                    </div>
-                </div>
-            </div>
-
-            <v-card
-                :style="`max-width: ${maxWidth}`"
-                class="mt-9 pt-9 mx-auto position-relative"
-                rounded="lg"
-                flat
-            >
-                <slot :combos="combos" :record="record" :theme="theme"></slot>
-            </v-card>
-
-            <div class="text-caption py-1" style="line-height: 0">&nbsp;</div>
-        </v-sheet>
-    </v-sheet>
-
-    <page-filter></page-filter>
+	<v-main style="min-height: 100dvh">
+		<v-container>
+			<slot
+				:combos="combos"
+				:highlight="highlight"
+				:record="record"
+				:store="store"
+				:theme="theme"
+			></slot>
+		</v-container>
+	</v-main>
 </template>
 
 <script>
@@ -93,77 +60,94 @@ import { usePageStore } from "@pinia/pageStore";
 import { storeToRefs } from "pinia";
 
 export default {
-    name: "page-blank",
+	name: "page-blank",
 
-    props: {
-        maxWidth: {
-            type: String,
-            default: "900px",
-        },
+	props: {
+		maxWidth: {
+			type: [String, Number],
+			default: "900",
+		},
 
-        pagePath: {
-            type: String,
-            default: null,
-        },
+		navbackTo: String,
 
-        pageName: {
-            type: String,
-            default: null,
-        },
+		pagePath: {
+			type: String,
+			default: null,
+		},
 
-        pageKey: {
-            type: String,
-            default: null,
-        },
+		pageName: {
+			type: String,
+			default: null,
+		},
 
-        pageTitle: {
-            type: String,
-            default: null,
-        },
+		pageKey: {
+			type: String,
+			default: null,
+		},
 
-        withProperty: {
-            type: Boolean,
-            default: false,
-        },
-    },
+		parentName: {
+			type: String,
+			default: null,
+		},
 
-    setup(props) {
-        const store = usePageStore();
+		parentKey: {
+			type: String,
+			default: null,
+		},
 
-        store.pageKey = props.pageKey;
-        store.pageName = props.pageName;
-        store.pagePath = props.pagePath;
-        store.pageTitle = props.pageTitle;
+		sidenavTitle: {
+			type: String,
+			default: "Utility",
+		},
 
-        const {
-            combos,
-            highlight,
-            module,
-            page,
-            record,
-            sidenavState,
-            railMode,
-            theme,
-        } = storeToRefs(store);
+		title: String,
 
-        const { getPageData } = store;
+		showSidenav: {
+			type: Boolean,
+			default: false,
+		},
+	},
 
-        return {
-            combos,
-            highlight,
-            module,
-            page,
-            record,
-            sidenavState,
-            railMode,
-            theme,
+	setup(props) {
+		const store = usePageStore();
 
-            getPageData,
-        };
-    },
+		store.pageKey = props.pageKey;
+		store.pageName = props.pageName;
+		store.pagePath = props.pagePath;
+		store.sidenavState = props.showSidenav;
 
-    created() {
-        this.getPageData();
-    },
+		const {
+			combos,
+			highlight,
+			module,
+			navigationState,
+			page,
+			sidenavState,
+			railMode,
+			record,
+			theme,
+		} = storeToRefs(store);
+
+		const { getPageData } = store;
+
+		return {
+			combos,
+			highlight,
+			module,
+			navigationState,
+			page,
+			sidenavState,
+			railMode,
+			record,
+			theme,
+
+			getPageData,
+			store,
+		};
+	},
+
+	created() {
+		this.getPageData();
+	},
 };
 </script>

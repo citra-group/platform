@@ -167,14 +167,6 @@ export const usePageStore = defineStore("pageStore", {
             });
         },
 
-        clearFilters() {
-            this.search = null;
-            this.paramsCache.findBy = null;
-
-            this.filters = {};
-            this.paramsCache.filters = null;
-        },
-
         finduser() {
             this.$http(`account/login-finder`, {
                 method: "POST",
@@ -351,6 +343,28 @@ export const usePageStore = defineStore("pageStore", {
             }
         },
 
+        jsonReplacer(match, pIndent, pKey, pVal, pEnd) {
+            let key = "<span class=json-key>";
+            let val = "<span class=json-value>";
+            let str = "<span class=json-string>";
+            let r = pIndent || "";
+
+            if (pKey) r = r + key + pKey.replace(/[": ]/g, "") + "</span>: ";
+            if (pVal) r = r + (pVal[0] == '"' ? str : val) + pVal + "</span>";
+            return r + (pEnd || "");
+        },
+
+        jsonPrettyPrint(obj) {
+            let jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/gm;
+
+            return JSON.stringify(obj, null, 3)
+                .replace(/&/g, "&amp;")
+                .replace(/\\"/g, "&quot;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(jsonLine, this.jsonReplacer);
+        },
+
         getCreateData() {
             this.combos = this.$storage.getItem("combos");
             this.recordBase = this.$storage.getItem("recordBase");
@@ -373,9 +387,8 @@ export const usePageStore = defineStore("pageStore", {
                 `${
                     this.module.prefix ? this.module.prefix + "/" : ""
                 }api/dashboard`
-            ).then(({ record, statuses }) => {
+            ).then(({ record }) => {
                 this.record = record;
-                this.statuses = statuses;
 
                 if (typeof callback === "function") {
                     callback(record);
@@ -485,6 +498,12 @@ export const usePageStore = defineStore("pageStore", {
                 this.$storage.setItem("token", response.token);
 
                 this.redirectUserToDashboard();
+            });
+        },
+
+        getUserDashboard() {
+            this.$http(`account/api/dashboard`).then((response) => {
+                this.mapResponseData(response);
             });
         },
 
@@ -771,21 +790,20 @@ export const usePageStore = defineStore("pageStore", {
             this.formStateLast = JSON.parse(JSON.stringify(this.formState));
             this.formState = "create";
 
-            if (this.sidenavState) {
-                this.sidenavState = false;
-
-                setTimeout(() => {
-                    this.$router.push({ name: this.page.slug + "-create" });
-                }, 300);
-            } else {
+            // if (this.sidenavState) {
+            //     this.sidenavState = false;
+            setTimeout(() => {
                 this.$router.push({ name: this.page.slug + "-create" });
-            }
+            }, 300);
+            // } else {
+            //     this.$router.push({ name: this.page.slug + "-create" });
+            // }
         },
 
         openFormData() {
             this.formStateLast = JSON.parse(JSON.stringify(this.formState));
             this.record = JSON.parse(JSON.stringify(this.recordBase));
-            this.helpState = false;
+            // this.helpState = false;
 
             if (this.formState === "create") {
                 this.search = null;
@@ -879,7 +897,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
@@ -906,7 +926,11 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records[index] = record;
+                if (index !== -1) {
+                    Object.keys(record).forEach((key) => {
+                        this.records[index][key] = record[key];
+                    });
+                }
 
                 this.openFormData();
 
@@ -937,7 +961,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
@@ -968,7 +994,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
