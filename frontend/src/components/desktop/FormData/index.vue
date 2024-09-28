@@ -37,7 +37,7 @@
             <v-icon>add</v-icon>
         </v-btn>
 
-        <slot name="toolbar" :hasSelected="hasSelected"></slot>
+        <slot name="toolbar" :record="record" :hasSelected="hasSelected"></slot>
 
         <v-btn
             icon="folder_open"
