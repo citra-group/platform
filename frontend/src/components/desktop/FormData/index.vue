@@ -141,9 +141,8 @@ export default {
             type: String,
             default: "chip",
         },
-        hideCreate: Boolean,
 
-        // disableCreate: Boolean,
+        hideCreate: Boolean,
 
         maxWidth: {
             type: [String, Number],
