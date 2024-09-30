@@ -29,15 +29,10 @@
 
         <v-spacer></v-spacer>
 
-        <v-btn
-            v-if="!disableCreate && !hasSelected"
-            icon
-            @click="openFormCreate"
-        >
+        <slot name="toolbar" :record="record" :hasSelected="hasSelected"></slot>
+        <v-btn v-if="!hideCreate && !hasSelected" icon @click="openFormCreate">
             <v-icon>add</v-icon>
         </v-btn>
-
-        <slot name="toolbar" :record="record" :hasSelected="hasSelected"></slot>
 
         <v-btn
             icon="folder_open"
@@ -146,8 +141,9 @@ export default {
             type: String,
             default: "chip",
         },
+        hideCreate: Boolean,
 
-        disableCreate: Boolean,
+        // disableCreate: Boolean,
 
         maxWidth: {
             type: [String, Number],

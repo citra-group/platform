@@ -298,6 +298,7 @@ export default {
             page,
             pageKey,
             softdelete,
+            statuses,
             record,
             theme,
             title,
@@ -323,6 +324,7 @@ export default {
             pageKey,
             record,
             softdelete,
+            statuses,
             theme,
             title,
 
