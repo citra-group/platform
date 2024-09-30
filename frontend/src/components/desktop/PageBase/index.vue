@@ -24,7 +24,7 @@
                         <v-list-item
                             v-for="(item, index) in sideMenus"
                             :key="index"
-                            @click="openPage(item)"
+                            :to="{ name: item.slug }"
                         >
                             <template v-slot:prepend="{ isActive }">
                                 <v-icon
@@ -152,14 +152,7 @@ export default {
 
     created() {
         this.initModule({ mobile: false });
-    },
-
-    methods: {
-        openPage: function (page) {
-            this.clearFilters();
-
-            this.$router.push({ name: page.slug });
-        },
+        this.clearFilters();
     },
 };
 </script>
