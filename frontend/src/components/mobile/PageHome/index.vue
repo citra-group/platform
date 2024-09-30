@@ -10,7 +10,7 @@
 
         <v-spacer></v-spacer>
 
-        <slot name="toolbar"></slot>
+        <slot name="toolbar" :statuses="statuses"></slot>
 
         <v-btn icon @click="gotoAccountModule">
             <v-icon>exit_to_app</v-icon>
@@ -173,6 +173,7 @@ export default {
             page,
             railMode,
             record,
+            statuses,
             theme,
         } = storeToRefs(store);
 
@@ -186,6 +187,7 @@ export default {
             railMode,
             record,
             dockMenus,
+            statuses,
             theme,
 
             getDashboard,
