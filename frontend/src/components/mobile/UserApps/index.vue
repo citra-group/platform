@@ -5,7 +5,7 @@
         :color="`${theme}`"
     >
         <v-toolbar-title class="text-body-2 font-weight-bold"
-            >SiMASTEN</v-toolbar-title
+            >CITRAPPS</v-toolbar-title
         >
 
         <v-spacer></v-spacer>

@@ -5,7 +5,7 @@
         :color="`${theme}`"
     >
         <v-toolbar-title class="text-body-2 font-weight-bold"
-            >SiMASTEN</v-toolbar-title
+            >CITRAPPS</v-toolbar-title
         >
 
         <v-spacer></v-spacer>
@@ -21,7 +21,7 @@
         <v-btn icon>
             <v-icon class="with-shadow">power_settings_new</v-icon>
 
-            <form-confirm icon="door_back" title="Keluar dari SiMASTEN?">
+            <form-confirm icon="door_back" title="Keluar dari CITRAPPS?">
                 <div class="text-caption text-grey-darken-1">
                     Saat Anda keluar dari aplikasi ini, semua data temporer yang
                     tersimpan pada perangkat ini juga akan di hapus.
