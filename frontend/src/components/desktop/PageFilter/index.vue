@@ -195,6 +195,8 @@
                                     placeholder="Cari Data"
                                     v-model="search"
                                     clearable
+                                    @keyup.enter="applyFilterData"
+                                    @click:clear="applyFilterData"
                                     hide-details
                                 ></v-text-field>
                             </v-card-text>
