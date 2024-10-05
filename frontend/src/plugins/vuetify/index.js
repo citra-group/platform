@@ -6,6 +6,7 @@ import { VLigatureIcon } from "vuetify/components";
 import { aliases } from "vuetify/iconsets/md";
 import { VDateInput } from "vuetify/labs/VDateInput";
 import { VNumberInput } from "vuetify/labs/VNumberInput";
+import { id } from "vuetify/locale";
 
 export default createVuetify({
     components: {
@@ -25,5 +26,11 @@ export default createVuetify({
                     }),
             },
         },
+    },
+
+    locale: {
+        locale: "id",
+        fallback: "en",
+        messages: { id },
     },
 });

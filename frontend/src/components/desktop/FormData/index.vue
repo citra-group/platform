@@ -105,9 +105,9 @@
                         }"
                     >
                         <slot
-                            name="tableRow"
+                            name="desktopRow"
                             :headers="headers"
-                            :item="item"
+                            :record="item"
                             :index="index"
                             :internalItem="internalItem"
                             :isSelected="isSelected"
