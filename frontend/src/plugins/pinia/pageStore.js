@@ -40,6 +40,7 @@ export const usePageStore = defineStore("pageStore", {
         geoIsDenied: false,
         geoInitialized: false,
         geoSupport: false,
+        getdata: false,
 
         headers: [],
         helpState: false,
@@ -374,9 +375,33 @@ export const usePageStore = defineStore("pageStore", {
         },
 
         getCreateData() {
-            this.combos = this.$storage.getItem("combos");
-            this.recordBase = this.$storage.getItem("recordBase");
-            this.record = JSON.parse(JSON.stringify(this.recordBase));
+            if (this.formState !== "create") {
+                this.formStateLast = JSON.parse(JSON.stringify(this.formState));
+                this.formState = "create";
+            }
+
+            if (!this.getdata) {
+                this.combos = this.$storage.getItem("combos");
+                this.recordBase = this.$storage.getItem("recordBase");
+                this.record = JSON.parse(JSON.stringify(this.recordBase));
+            } else {
+                const defaultParams = this.mapDefaultParams();
+
+                if (!defaultParams) {
+                    return;
+                }
+
+                let pagePath = this.buildPath + "/create";
+
+                this.$http(pagePath, {
+                    method: "GET",
+                    params: defaultParams,
+                })
+                    .then((response) => {
+                        this.mapResponseData(response);
+                    })
+                    .catch(() => this.mapPageDatasError());
+            }
 
             // if (Object.keys(this.record).length <= 0) {
             //     this.recordBase = this.$storage.getItem("recordBase");
@@ -549,7 +574,7 @@ export const usePageStore = defineStore("pageStore", {
         },
 
         mapResponseData(response) {
-            if ("data" in response) {
+            if ("data" in response || "setups" in response) {
                 const { data, meta, setups } = response;
 
                 /** map meta */
