@@ -133,6 +133,14 @@
             </v-btn>
         </template>
 
+        <slot
+            name="toolbar"
+            :record="record"
+            :theme="theme"
+            :statuses="statuses"
+            :store="store"
+        ></slot>
+
         <v-btn v-if="withHelpdesk" icon @click="helpState = !helpState">
             <v-icon
                 :style="

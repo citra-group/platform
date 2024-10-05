@@ -36,7 +36,18 @@
         </v-btn>
     </v-app-bar>
 
-    <page-sidenav :title="sidenavTitle"></page-sidenav>
+    <page-sidenav :title="sidenavTitle">
+        <template v-slot:info>
+            <slot
+                name="info"
+                :combos="combos"
+                :record="record"
+                :statuses="statuses"
+                :theme="theme"
+                :store="store"
+            ></slot>
+        </template>
+    </page-sidenav>
 
     <v-main style="min-height: 100dvh">
         <v-container>
@@ -49,6 +60,20 @@
             ></slot>
         </v-container>
     </v-main>
+
+    <!-- <v-main style="min-height: 100dvh">
+        <v-container>
+            <page-paper :max-width="maxWidth">
+                <slot
+                    :combos="combos"
+                    :record="record"
+                    :theme="theme"
+                    :statuses="statuses"
+                    :store="store"
+                ></slot>
+            </page-paper>
+        </v-container>
+    </v-main> -->
 </template>
 
 <script>
@@ -118,6 +143,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,
@@ -132,6 +158,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,
