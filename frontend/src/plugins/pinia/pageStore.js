@@ -574,7 +574,7 @@ export const usePageStore = defineStore("pageStore", {
         },
 
         mapResponseData(response) {
-            if ("data" in response || "setups" in response) {
+            if ("data" in response || !("record" in response)) {
                 const { data, meta, setups } = response;
 
                 /** map meta */
