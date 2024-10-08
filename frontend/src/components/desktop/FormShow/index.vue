@@ -126,21 +126,20 @@
                         </v-row>
                     </template>
                 </form-confirm>
-
-                <v-tooltip activator="parent" location="bottom"
-                    >Hapus</v-tooltip
-                >
             </v-btn>
         </template>
+        <div>
+            <slot
+                name="toolbar"
+                :record="record"
+                :theme="theme"
+                :statuses="statuses"
+                :store="store"
+            >
+            </slot>
 
-        <slot
-            name="toolbar"
-            :record="record"
-            :theme="theme"
-            :statuses="statuses"
-            :store="store"
-        ></slot>
-
+            <!-- <v-tooltip activator="parent" location="bottom">tess</v-tooltip> -->
+        </div>
         <v-btn v-if="withHelpdesk" icon @click="helpState = !helpState">
             <v-icon
                 :style="
@@ -214,6 +213,11 @@ export default {
         navbackTo: String,
         withActivityLogs: Boolean,
         withHelpdesk: Boolean,
+
+        tooltip: {
+            type: String,
+            default: null,
+        },
     },
 
     setup(props) {
