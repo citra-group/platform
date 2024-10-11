@@ -317,6 +317,22 @@
                                         readonly
                                     ></v-date-input>
 
+                                    <v-combobox
+                                        v-if="filter.type === 'combobox'"
+                                        :disabled="hasSelected"
+                                        :items="filter.data"
+                                        density="comfortable"
+                                        :return-object="false"
+                                        v-model="filter.value"
+                                        hide-details
+                                        @update:modelValue="
+                                            () =>
+                                                (filter.used =
+                                                    filter.value &&
+                                                    filter.value !== '')
+                                        "
+                                    ></v-combobox>
+
                                     <v-select
                                         v-if="filter.type === 'Select'"
                                         :disabled="hasSelected"
