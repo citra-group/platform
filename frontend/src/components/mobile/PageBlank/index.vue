@@ -13,7 +13,24 @@
         }}</v-toolbar-title>
 
         <v-spacer></v-spacer>
+
+        <v-btn icon @click="sidenavState = !sidenavState">
+            <v-icon>filter_list</v-icon>
+        </v-btn>
     </v-app-bar>
+
+    <page-sidenav :title="sidenavTitle">
+        <template v-slot:info>
+            <slot
+                name="info"
+                :combos="combos"
+                :record="record"
+                :statuses="statuses"
+                :theme="theme"
+                :store="store"
+            ></slot>
+        </template>
+    </page-sidenav>
 
     <v-sheet
         :color="`${theme}`"
@@ -22,15 +39,53 @@
     ></v-sheet>
 
     <v-main>
-        <v-card-text>
-            <slot
-                :combos="combos"
-                :highlight="highlight"
-                :record="record"
-                :store="store"
-                :theme="theme"
-            ></slot>
-        </v-card-text>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
+            >
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
+
+                    <div
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase pt-1 text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
+                    >
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            {{ page.name }}
+                        </div>
+                    </div>
+                </div>
+            </v-sheet>
+
+            <v-sheet
+                class="position-relative pt-7"
+                elevation="1"
+                min-height="calc(100dvh - 172px)"
+                rounded="lg"
+                flat
+            >
+                <slot
+                    :combos="combos"
+                    :highlight="highlight"
+                    :record="record"
+                    :statuses="statuses"
+                    :store="store"
+                    :theme="theme"
+                ></slot>
+            </v-sheet>
+        </v-sheet>
     </v-main>
 </template>
 
@@ -100,6 +155,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,
@@ -114,6 +170,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,
