@@ -55,7 +55,7 @@
                                 :color="`${highlight}-darken-1`"
                                 :highlight="`white`"
                                 :icon="page.icon"
-                                :label="page.name"
+                                :label="page.title"
                                 rounded="xl"
                                 @click="openPage(page)"
                             ></widget-apps>
