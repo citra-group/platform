@@ -622,6 +622,7 @@ export const usePageStore = defineStore("pageStore", {
                             ? recordBase
                             : {};
                     this.record = JSON.parse(JSON.stringify(this.recordBase));
+
                     this.usetrash = usetrash ?? false;
                     this.statuses =
                         statuses && Object.keys(statuses).length > 0
@@ -639,6 +640,7 @@ export const usePageStore = defineStore("pageStore", {
                 /** map record */
                 if (this.isMobile) {
                     if (
+                        data &&
                         Object.keys(this.paramsCache).length > 0 &&
                         this.paramsCache.trashed === this.paramsOld.trashed &&
                         this.paramsCache.findBy === this.paramsOld.findBy &&

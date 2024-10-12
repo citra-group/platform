@@ -116,14 +116,15 @@ export default {
 
     props: {
         beforePost: Function,
-        contentClass: String,
         hideSave: Boolean,
-        width: {
+        getdata: Boolean,
+        maxWidth: {
             type: String,
             default: "500px",
         },
+        navbackTo: String,
+        withActivityLogs: Boolean,
         withHelpdesk: Boolean,
-        getdata: Boolean,
     },
 
     setup(props) {
@@ -165,7 +166,7 @@ export default {
         };
     },
 
-    mounted() {
+    created() {
         this.getCreateData();
     },
 
