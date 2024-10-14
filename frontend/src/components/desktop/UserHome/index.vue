@@ -74,6 +74,8 @@ export default {
     name: "user-home",
 
     props: {
+        clearFilters: Boolean,
+
         pageName: {
             type: String,
             default: null,
@@ -95,6 +97,10 @@ export default {
 
         store.pageName = props.pageName;
         store.pageKey = props.pageKey;
+
+        if (props.clearFilters) {
+            store.clearFilters();
+        }
 
         const {
             auth,

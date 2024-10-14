@@ -100,7 +100,7 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { clearFilters, initModule } = store;
+        const { initModule } = store;
 
         return {
             auth,
@@ -112,7 +112,6 @@ export default {
             snackbar,
             theme,
 
-            clearFilters,
             initModule,
         };
     },
@@ -123,8 +122,6 @@ export default {
 
     methods: {
         openPage: function (page) {
-            this.clearFilters();
-
             this.$router.push({ name: page.slug });
         },
     },

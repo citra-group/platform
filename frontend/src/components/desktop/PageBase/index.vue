@@ -134,7 +134,7 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { clearFilters, initModule } = store;
+        const { initModule } = store;
 
         return {
             auth,
@@ -145,14 +145,12 @@ export default {
             snackbar,
             theme,
 
-            clearFilters,
             initModule,
         };
     },
 
     created() {
         this.initModule({ mobile: false });
-        this.clearFilters();
     },
 };
 </script>

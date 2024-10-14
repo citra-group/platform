@@ -81,6 +81,8 @@ export default {
     },
 
     props: {
+        clearFilters: Boolean,
+
         maxWidth: {
             type: String,
             default: "900px",
@@ -103,6 +105,10 @@ export default {
         store.pageName = props.pageName;
         store.pageKey = props.pageKey;
 
+        if (props.clearFilters) {
+            store.clearFilters();
+        }
+
         const {
             auth,
             dockMenus,
@@ -115,7 +121,7 @@ export default {
             theme,
         } = storeToRefs(store);
 
-        const { clearFilters, getDashboard } = store;
+        const { getDashboard } = store;
 
         return {
             auth,
@@ -128,7 +134,6 @@ export default {
             statuses,
             theme,
 
-            clearFilters,
             getDashboard,
             store,
         };
@@ -142,14 +147,10 @@ export default {
 
     methods: {
         gotoAccountModule: function () {
-            this.clearFilters();
-
             this.$router.push({ name: "account-module" });
         },
 
         openPage: function (page) {
-            this.clearFilters();
-
             this.$router.push({ name: page.slug });
         },
     },
