@@ -20,6 +20,13 @@
             <v-tooltip activator="parent" location="bottom">Simpan</v-tooltip>
         </v-btn>
 
+        <slot
+            name="toolbar"
+            :record="record"
+            :theme="theme"
+            :store="store"
+        ></slot>
+
         <v-btn
             v-if="withHelpdesk"
             :color="helpState ? 'white' : `${theme}-lighten-3`"
