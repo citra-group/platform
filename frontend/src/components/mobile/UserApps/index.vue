@@ -44,6 +44,8 @@ export default {
     name: "user-apps",
 
     props: {
+        clearFilters: Boolean,
+
         maxWidth: {
             type: [String, Number],
             default: "500",
@@ -69,6 +71,10 @@ export default {
 
         store.pageName = props.pageName;
         store.pageKey = props.pageKey;
+
+        if (props.clearFilters) {
+            store.clearFilters();
+        }
 
         const {
             auth,
