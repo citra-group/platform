@@ -230,6 +230,7 @@
                     :record="record"
                     :theme="theme"
                     :store="store"
+                    :statuses="statuses"
                 ></slot>
             </v-sheet>
         </v-sheet>
@@ -247,6 +248,7 @@
                 :record="record"
                 :theme="theme"
                 :store="store"
+                :statuses="statuses"
             ></slot>
         </template>
 
