@@ -1,7 +1,7 @@
 <template>
 	<v-sheet
 		:max-width="maxWidth"
-		class="bg-transparent mx-auto position-relative px-0 pt-9 pb-4"
+		class="bg-transparent mx-auto position-relative px-0 pt-9"
 	>
 		<v-sheet
 			class="position-absolute"
