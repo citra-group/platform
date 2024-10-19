@@ -25,7 +25,7 @@
 
         <v-btn
             v-if="!hideCreate && !hasSelected"
-            :color="highlight"
+            :color="`${highlight}-lighten-5`"
             icon
             @click="openFormCreate"
         >

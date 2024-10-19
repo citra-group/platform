@@ -10,7 +10,7 @@
             style="z-index: 1"
         >
             <template v-slot:prepend>
-                <v-avatar :color="`${theme}-lighten-4`">
+                <v-avatar :color="`${theme}-lighten-2`">
                     <v-icon class="with-shadow" color="white">{{
                         Object.hasOwn(value, "icon")
                             ? value["icon"]

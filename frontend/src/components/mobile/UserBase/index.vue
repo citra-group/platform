@@ -39,8 +39,8 @@
 
         <v-bottom-navigation
             :active="navigationState"
-            :base-color="`${theme}-lighten-2`"
-            :color="`${theme}-darken-1`"
+            :base-color="`${theme}-lighten-1`"
+            :color="`${theme}-darken-3`"
         >
             <v-btn
                 v-for="(page, index) in appsMenus"
