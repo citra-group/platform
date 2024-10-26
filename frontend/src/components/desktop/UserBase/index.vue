@@ -31,7 +31,7 @@
                                     :color="
                                         isActive
                                             ? `white`
-                                            : `${theme}-lighten-2`
+                                            : `${theme}-lighten-4`
                                     "
                                     :icon="page.icon"
                                 ></v-icon>
@@ -42,7 +42,7 @@
                                     :class="
                                         isActive
                                             ? `white`
-                                            : `text-${theme}-lighten-2`
+                                            : `text-${theme}-lighten-4`
                                     "
                                     >{{ page.name }}</v-list-item-title
                                 >

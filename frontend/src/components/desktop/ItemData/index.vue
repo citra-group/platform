@@ -3,7 +3,7 @@
         <td>
             <v-checkbox-btn
                 :model-value="isSelected(internalItem)"
-                color="blue-grey"
+                :color="theme"
                 @update:model-value="toggleSelect(internalItem)"
             ></v-checkbox-btn>
         </td>
@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import { usePageStore } from "@pinia/pageStore";
+import { storeToRefs } from "pinia";
 export default {
     name: "item-data",
 
@@ -38,6 +40,16 @@ export default {
         internalItem: Object,
         isSelected: Function,
         toggleSelect: Function,
+    },
+
+    setup() {
+        const store = usePageStore();
+
+        const { theme } = storeToRefs(store);
+
+        return {
+            theme,
+        };
     },
 };
 </script>
