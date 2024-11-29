@@ -5,6 +5,11 @@
             src="/images/citrapps.svg"
             style="margin-left: 0px; height: 48px; width: auto"
         />
+        <!-- <img
+            class="px-1"
+            :src="auth.avatar ?? `/avatars/${auth.gender}-avatar.svg`"
+            style="margin-left: 0px; height: 48px; width: auto"
+        /> -->
 
         <div class="d-flex flex-column pl-4">
             <div
@@ -15,14 +20,40 @@
             </div>
 
             <div class="text-caption text-white" style="line-height: 1">
-                version 3.0.0
+                {{ auth.username }}
             </div>
+
+            <!-- <div class="text-caption text-white" style="line-height: 1">
+                version 3.0.0
+            </div> -->
         </div>
     </div>
 </template>
 
 <script>
+import { usePageStore } from "@pinia/pageStore";
+import { storeToRefs } from "pinia";
 export default {
     name: "part-logo",
+    props: {
+        textLeft: String,
+        textRight: String,
+        maxWidth: {
+            type: [String, Number],
+            default: "100%",
+        },
+        userAvatar: Boolean,
+    },
+
+    setup() {
+        const store = usePageStore();
+
+        const { auth, theme } = storeToRefs(store);
+
+        return {
+            auth,
+            theme,
+        };
+    },
 };
 </script>

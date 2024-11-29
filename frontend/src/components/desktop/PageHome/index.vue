@@ -13,7 +13,13 @@
 
         <v-spacer></v-spacer>
 
-        <slot name="toolbar" :statuses="statuses"></slot>
+        <slot
+            name="toolbar"
+            :record="record"
+            :theme="theme"
+            :statuses="statuses"
+            :store="store"
+        ></slot>
 
         <v-btn icon @click="gotoAccountModule">
             <v-icon>exit_to_app</v-icon>
@@ -64,7 +70,14 @@
                 </v-sheet>
             </page-paper>
 
-            <slot :record="record" :store="store" :theme="theme"></slot>
+            <slot
+                :mapResponseData="mapResponseData"
+                :combos="combos"
+                :record="record"
+                :store="store"
+                :theme="theme"
+                :statuses="statuses"
+            ></slot>
         </v-container>
     </v-main>
 </template>
@@ -102,14 +115,17 @@ export default {
     setup(props) {
         const store = usePageStore();
 
+        store.beforePost = props.beforePost;
+
         store.pageName = props.pageName;
         store.pageKey = props.pageKey;
 
-        if (props.clearFilters) {
-            store.clearFilters();
-        }
+        // if (props.clearFilters) {
+        //     store.clearFilters();
+        // }
 
         const {
+            combos,
             auth,
             dockMenus,
             highlight,
@@ -118,12 +134,14 @@ export default {
             railMode,
             record,
             statuses,
+
             theme,
         } = storeToRefs(store);
 
-        const { getDashboard } = store;
+        const { getDashboard, mapResponseData } = store;
 
         return {
+            combos,
             auth,
             dockMenus,
             highlight,
@@ -132,7 +150,9 @@ export default {
             railMode,
             record,
             statuses,
+
             theme,
+            mapResponseData,
 
             getDashboard,
             store,
