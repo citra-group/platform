@@ -12,49 +12,27 @@ class PlatformModuleInstall extends Command
      *
      * @var string
      */
-    protected $signature = 'module:install
-        {module}
-    ';
+    protected $signature = 'module:install';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Make monosoft module install';
+    protected $description = 'Install monosoft modules from env';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        /** GET MODULE INFO */
-        $modules = Cache::get('modules');
+        $gitbase    = env('GITBASE');
+        $modules    = explode(",", env('MODULES', ''));
 
-        if (is_array($modules) && array_key_exists($this->argument('module'), $modules)) {
-            $module = $modules[$this->argument('module')];
-        } else {
-            $this->error('The module not exists.');
-            return;
-        }
-
-        /** GET SEEDER PATTERN */
-        // {NAMESPACE}{MODULE}\Seeders\{MODULE}BaseSeeder
-        // {NAMESPACE}{MODULE}\Seeders\{MODULE}UserSeeder
-
-        $moduleSeeder = $module->namespace . $module->name . '\\Seeders\\' . $module->name;
-
-        if (class_exists($moduleBaseSeeder = $moduleSeeder . 'BaseSeeder')) {
-            $this->call('module:seed', [
-                'class' => $module->name . 'BaseSeeder',
-                '--module' => $module->name
-            ]);
-        }
-
-        if (class_exists($moduleUserSeeder = $moduleSeeder . 'UserSeeder')) {
-            $this->call('module:seed', [
-                'class' => $module->name . 'UserSeeder',
-                '--module' => $module->name
+        foreach ($modules as $module) {
+            $this->call('module:clone', [
+                'repository' => $gitbase . DIRECTORY_SEPARATOR . str($module)->before("|")->toString(),
+                '--directory' => str($module)->after("|")->toString()
             ]);
         }
     }

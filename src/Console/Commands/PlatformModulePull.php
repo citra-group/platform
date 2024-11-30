@@ -41,7 +41,7 @@ class PlatformModulePull extends Command
             'git',
             'pull',
             'origin',
-            'main'
+            env('GITBRANCH', 'main')
         ]);
 
         $process->setWorkingDirectory(base_path() . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $this->option('directory'));
