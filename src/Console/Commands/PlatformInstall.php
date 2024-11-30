@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform\Console\Commands;
+namespace Citrapp\Platform\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -130,7 +130,7 @@ class PlatformInstall extends Command
 
         $content = json_decode(file_get_contents($composerFile), true);
 
-        if(!array_key_exists('merge-plugin', $content['extra'])) {
+        if (!array_key_exists('merge-plugin', $content['extra'])) {
             $content['extra']['merge-plugin'] = [
                 'include' => [
                     "modules/*/composer.json"
@@ -198,14 +198,14 @@ class PlatformInstall extends Command
             (new Filesystem())->replaceInFile(
                 'BCRYPT_ROUNDS=12',
                 'BCRYPT_ROUNDS=12' . PHP_EOL .
-                'AUTH_MODEL=Module\System\Models\SystemUser' . PHP_EOL .
-                'AUTH_PASSWORD_RESET_TOKEN_TABLE=system_password_reset_tokens' . PHP_EOL .
-                'DB_CACHE_TABLE=system_cache' . PHP_EOL .
-                'DB_QUEUE_TABLE=system_jobs' . PHP_EOL .
-                'DB_QUEUE_BATCH_TABLE=system_job_batches' . PHP_EOL .
-                'DB_QUEUE_FAILED_TABLE=system_failded_jobs' . PHP_EOL .
-                'SESSION_TABLE=system_sessions' . PHP_EOL .
-                'SANCTUM_STATEFUL_DOMAINS=hmr.devcitragroup.test:3000',
+                    'AUTH_MODEL=Module\System\Models\SystemUser' . PHP_EOL .
+                    'AUTH_PASSWORD_RESET_TOKEN_TABLE=system_password_reset_tokens' . PHP_EOL .
+                    'DB_CACHE_TABLE=system_cache' . PHP_EOL .
+                    'DB_QUEUE_TABLE=system_jobs' . PHP_EOL .
+                    'DB_QUEUE_BATCH_TABLE=system_job_batches' . PHP_EOL .
+                    'DB_QUEUE_FAILED_TABLE=system_failded_jobs' . PHP_EOL .
+                    'SESSION_TABLE=system_sessions' . PHP_EOL .
+                    'SANCTUM_STATEFUL_DOMAINS=hmr.devcitragroup.test:3000',
                 $envFile,
             );
         }
@@ -219,7 +219,8 @@ class PlatformInstall extends Command
     protected function runComposerUpdate(): void
     {
         $process = new Process([
-            'composer', 'update'
+            'composer',
+            'update'
         ]);
 
         $process->setWorkingDirectory(base_path());

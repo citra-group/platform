@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform\Console\Commands;
+namespace Citrapp\Platform\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -69,12 +69,12 @@ class PlatformMakeReplica extends Command
         /** SET FILE OUTPUT */
         $filepath = base_path(
             'modules' .
-            DIRECTORY_SEPARATOR .
-            str($module->name)->lower() .
-            DIRECTORY_SEPARATOR .
-            'src' .
-            DIRECTORY_SEPARATOR .
-            'Models'
+                DIRECTORY_SEPARATOR .
+                str($module->name)->lower() .
+                DIRECTORY_SEPARATOR .
+                'src' .
+                DIRECTORY_SEPARATOR .
+                'Models'
         );
 
         $modelname = $this->argument('name');

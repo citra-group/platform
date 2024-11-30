@@ -4,7 +4,7 @@ namespace $NAMESPACE$\$MODULE$\Providers;
 
 use ReflectionProperty;
 use Illuminate\Support\Arr;
-use CitraGroup\Platform\DiscoverEvents;
+use Citrapp\Platform\DiscoverEvents;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider

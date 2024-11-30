@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform;
+namespace Citrapp\Platform;
 
 use SplFileInfo;
 use ReflectionClass;
@@ -39,12 +39,13 @@ class DiscoverEvents extends BaseDiscoveryEvents
 
             foreach ($listener->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
                 if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) ||
-                    ! isset($method->getParameters()[0])) {
+                    ! isset($method->getParameters()[0])
+                ) {
                     continue;
                 }
 
-                $listenerEvents[$listener->name.'@'.$method->name] =
-                                Reflector::getParameterClassNames($method->getParameters()[0]);
+                $listenerEvents[$listener->name . '@' . $method->name] =
+                    Reflector::getParameterClassNames($method->getParameters()[0]);
             }
         }
 
@@ -71,7 +72,7 @@ class DiscoverEvents extends BaseDiscoveryEvents
         $class = 'Module' . DIRECTORY_SEPARATOR . $module . Str::of($class)->after('src');
 
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'],
+            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())) . '\\'],
             ['\\', app()->getNamespace()],
             ucfirst(Str::replaceLast('.php', '', $class))
         );

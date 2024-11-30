@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform;
+namespace Citrapp\Platform;
 
 use Laravel\Fortify\Fortify;
 use Illuminate\Support\Facades\URL;
@@ -9,32 +9,32 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
-use CitraGroup\Platform\Http\Middleware\Impersonate;
-use CitraGroup\Platform\Console\Commands\PlatformInstall;
-use CitraGroup\Platform\Console\Commands\PlatformMakeJob;
-use CitraGroup\Platform\Console\Commands\PlatformMakeSeed;
-use CitraGroup\Platform\Console\Commands\PlatformMakeEvent;
-use CitraGroup\Platform\Console\Commands\PlatformMakeModel;
-use CitraGroup\Platform\Console\Commands\PlatformMakeExport;
-use CitraGroup\Platform\Console\Commands\PlatformMakeImport;
-use CitraGroup\Platform\Console\Commands\PlatformMakeModule;
-use CitraGroup\Platform\Console\Commands\PlatformMakePolicy;
-use CitraGroup\Platform\Console\Commands\PlatformModuleList;
-use CitraGroup\Platform\Console\Commands\PlatformModulePull;
-use CitraGroup\Platform\Console\Commands\PlatformModuleSeed;
-use CitraGroup\Platform\Console\Commands\PlatformMakeCommand;
-use CitraGroup\Platform\Console\Commands\PlatformMakeReplica;
-use CitraGroup\Platform\Console\Commands\PlatformModuleClone;
-use CitraGroup\Platform\Console\Commands\PlatformMakeFrontend;
-use CitraGroup\Platform\Console\Commands\PlatformMakeListener;
-use CitraGroup\Platform\Console\Commands\PlatformMakeResource;
-use CitraGroup\Platform\Console\Commands\PlatformModuleDelete;
-use CitraGroup\Platform\Console\Commands\PlatformModuleUpdate;
-use CitraGroup\Platform\Console\Commands\PlatformMakeMigration;
-use CitraGroup\Platform\Console\Commands\PlatformModuleInstall;
-use CitraGroup\Platform\Console\Commands\PlatformModuleMigrate;
-use CitraGroup\Platform\Console\Commands\PlatformMakeController;
-use CitraGroup\Platform\Console\Commands\PlatformMakeNotification;
+use Citrapp\Platform\Http\Middleware\Impersonate;
+use Citrapp\Platform\Console\Commands\PlatformInstall;
+use Citrapp\Platform\Console\Commands\PlatformMakeJob;
+use Citrapp\Platform\Console\Commands\PlatformMakeSeed;
+use Citrapp\Platform\Console\Commands\PlatformMakeEvent;
+use Citrapp\Platform\Console\Commands\PlatformMakeModel;
+use Citrapp\Platform\Console\Commands\PlatformMakeExport;
+use Citrapp\Platform\Console\Commands\PlatformMakeImport;
+use Citrapp\Platform\Console\Commands\PlatformMakeModule;
+use Citrapp\Platform\Console\Commands\PlatformMakePolicy;
+use Citrapp\Platform\Console\Commands\PlatformModuleList;
+use Citrapp\Platform\Console\Commands\PlatformModulePull;
+use Citrapp\Platform\Console\Commands\PlatformModuleSeed;
+use Citrapp\Platform\Console\Commands\PlatformMakeCommand;
+use Citrapp\Platform\Console\Commands\PlatformMakeReplica;
+use Citrapp\Platform\Console\Commands\PlatformModuleClone;
+use Citrapp\Platform\Console\Commands\PlatformMakeFrontend;
+use Citrapp\Platform\Console\Commands\PlatformMakeListener;
+use Citrapp\Platform\Console\Commands\PlatformMakeResource;
+use Citrapp\Platform\Console\Commands\PlatformModuleDelete;
+use Citrapp\Platform\Console\Commands\PlatformModuleUpdate;
+use Citrapp\Platform\Console\Commands\PlatformMakeMigration;
+use Citrapp\Platform\Console\Commands\PlatformModuleInstall;
+use Citrapp\Platform\Console\Commands\PlatformModuleMigrate;
+use Citrapp\Platform\Console\Commands\PlatformMakeController;
+use Citrapp\Platform\Console\Commands\PlatformMakeNotification;
 
 class ModularServiceProvider extends ServiceProvider
 {
