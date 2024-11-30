@@ -505,9 +505,12 @@ export const usePageStore = defineStore("pageStore", {
                 this.auth = response.auth;
                 this.checksum = response.checksum;
                 this.modules = response.modules;
-                this.theme = "theme" in this.auth ? this.auth.theme : "teal";
+                this.theme =
+                    this.auth && "theme" in this.auth
+                        ? this.auth.theme
+                        : "teal";
                 this.highlight =
-                    "highlight" in this.auth
+                    this.auth && "highlight" in this.auth
                         ? this.auth.highlight
                         : "deep-orange";
 
