@@ -20,6 +20,7 @@ use CitraGroup\Platform\Console\Commands\PlatformMakeImport;
 use CitraGroup\Platform\Console\Commands\PlatformMakeModule;
 use CitraGroup\Platform\Console\Commands\PlatformMakePolicy;
 use CitraGroup\Platform\Console\Commands\PlatformModuleList;
+use CitraGroup\Platform\Console\Commands\PlatformModulePull;
 use CitraGroup\Platform\Console\Commands\PlatformModuleSeed;
 use CitraGroup\Platform\Console\Commands\PlatformMakeCommand;
 use CitraGroup\Platform\Console\Commands\PlatformMakeReplica;
@@ -28,6 +29,7 @@ use CitraGroup\Platform\Console\Commands\PlatformMakeFrontend;
 use CitraGroup\Platform\Console\Commands\PlatformMakeListener;
 use CitraGroup\Platform\Console\Commands\PlatformMakeResource;
 use CitraGroup\Platform\Console\Commands\PlatformModuleDelete;
+use CitraGroup\Platform\Console\Commands\PlatformModuleUpdate;
 use CitraGroup\Platform\Console\Commands\PlatformMakeMigration;
 use CitraGroup\Platform\Console\Commands\PlatformModuleInstall;
 use CitraGroup\Platform\Console\Commands\PlatformModuleMigrate;
@@ -124,7 +126,9 @@ class ModularServiceProvider extends ServiceProvider
                 PlatformModuleInstall::class,
                 PlatformModuleList::class,
                 PlatformModuleMigrate::class,
-                PlatformModuleSeed::class
+                PlatformModulePull::class,
+                PlatformModuleSeed::class,
+                PlatformModuleUpdate::class
             ]);
         }
     }
