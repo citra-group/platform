@@ -32,13 +32,19 @@
                         </div>
 
                         <v-chip
+                            :color="getChipColor(value[chip])"
+                            size="x-small"
+                            label
+                            >{{ value[chip] }}</v-chip
+                        >
+                        <!-- <v-chip
                             :color="`${theme}-lighten-5`"
                             :class="`text-${theme}`"
                             size="x-small"
                             variant="flat"
                             label
                             >{{ value[chip] }}</v-chip
-                        >
+                        > -->
                     </div>
 
                     <template v-else>
@@ -146,6 +152,72 @@ export default {
 
             openFormShow,
         };
+    },
+
+    methods: {
+        getChipColor(chip) {
+            switch (chip) {
+                case "SELESAI":
+                    return "green";
+
+                case "LUNAS":
+                    return "green";
+
+                case "BERHASIL":
+                    return "green";
+
+                case "BERJALAN":
+                    return "primary";
+
+                case "DITERBITKAN":
+                    return "purple";
+
+                case "DITOLAK":
+                    return "red";
+
+                case "DISETUJUI":
+                    return "light-green";
+
+                case "TERIMA PEMBAYARAN":
+                    return "light-green";
+
+                case "BELUM BAYAR":
+                    return "red";
+
+                case "BELUM DIBAYAR":
+                    return "red";
+
+                case "SUDAH LUNAS":
+                    return "green";
+
+                case "DRAFT":
+                    return "blue-grey";
+
+                case "REPAIRED":
+                    return "orange";
+
+                case "REJECTED":
+                    return "red";
+
+                case "VERIFIED":
+                    return "yellow";
+
+                case "APPROVED":
+                    return "cyan";
+
+                case "ONGOING":
+                    return "green";
+
+                case "PUBLISH":
+                    return "primary";
+
+                case "COMPLETED":
+                    return "brown";
+
+                default:
+                    return "grey";
+            }
+        },
     },
 };
 </script>

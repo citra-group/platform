@@ -31,7 +31,7 @@ export default {
             <v-spacer></v-spacer>
 
             <v-btn density="compact" icon @click="showTable = !showTable">
-                <v-icon size="small">table_chart</v-icon>
+                <v-icon size="small" v-if="!hideIcon">table_chart</v-icon>
             </v-btn>
         </v-toolbar>
 
@@ -62,6 +62,7 @@ export default {
     props: {
         title: String,
         vertical: Boolean,
+        hideIcon: Boolean,
     },
 
     data: () => ({
@@ -69,3 +70,5 @@ export default {
     }),
 };
 </script>
+
+<style scoped></style>
