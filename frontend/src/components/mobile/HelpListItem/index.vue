@@ -10,9 +10,12 @@
 
         <td style="padding-top: 16px">
             <span class="text-caption font-weight-medium">{{ title }}</span>
-            <span class="d-block text-caption text-grey-darken-1">{{
-                subtitle
-            }}</span>
+
+            <span class="d-block text-caption text-grey-darken-1">
+                <slot>
+                    {{ subtitle }}
+                </slot>
+            </span>
         </td>
     </tr>
 </template>

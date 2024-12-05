@@ -6,9 +6,9 @@ import { defineStore } from "pinia";
 
 export const usePageStore = defineStore("pageStore", {
     state: () => ({
-        email: "monoland@dev",
-        password: "P@ssw0rd",
-        password_confirmation: "P@ssw0rd",
+        email: null,
+        password: null,
+        password_confirmation: null,
         forgotPassword: false,
         challengedPassword: false,
         resetFeature: false,
@@ -19,71 +19,16 @@ export const usePageStore = defineStore("pageStore", {
 
         auth: null,
         activityLog: false,
-        accountBase: {
-            domain: "backend",
-            name: "Account",
-            prefix: "account",
-            slug: "account",
-            pages: [
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "dashboard",
-                    name: "Beranda",
-                    order: 1,
-                    parent: true,
-                    parent_path: null,
-                    path: "dashboard",
-                    side: true,
-                    slug: "account-dashboard",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "local_activity",
-                    name: "Aktifitas",
-                    order: 2,
-                    parent: true,
-                    parent_path: null,
-                    path: "activity",
-                    side: true,
-                    slug: "account-activity",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "notifications",
-                    name: "Notifikasi",
-                    order: 3,
-                    parent: true,
-                    parent_path: null,
-                    path: "notification",
-                    side: true,
-                    slug: "account-notification",
-                },
-
-                {
-                    dock: false,
-                    enabled: true,
-                    icon: "perm_identity",
-                    name: "Setting",
-                    order: 4,
-                    parent: true,
-                    parent_path: null,
-                    path: "setting",
-                    side: true,
-                    slug: "account-setting",
-                },
-            ],
-        },
+        accountBase: {},
+        appsMenus: [],
 
         beforePost: undefined,
 
         checksum: null,
         combos: {},
+        currentFile: {},
 
+        dialogFile: false,
         dockMenus: [],
         domain: "backend",
 
@@ -95,6 +40,7 @@ export const usePageStore = defineStore("pageStore", {
         geoIsDenied: false,
         geoInitialized: false,
         geoSupport: false,
+        getdata: false,
 
         headers: [],
         helpState: false,
@@ -104,6 +50,7 @@ export const usePageStore = defineStore("pageStore", {
         initialized: false,
         itemsPerPage: 10,
         isMobile: false,
+        impersonated: false,
 
         key: null,
 
@@ -138,16 +85,16 @@ export const usePageStore = defineStore("pageStore", {
         parentKey: null,
         parentName: null,
 
-        pulse: {},
-
         railMode: false,
         record: {},
         recordBase: {},
         records: [],
+        routePrefix: false,
 
         search: null,
         selected: [],
         sideMenus: [],
+        sidehelpState: false,
         sidenavState: false,
         snackbar: {
             color: "red",
@@ -161,6 +108,8 @@ export const usePageStore = defineStore("pageStore", {
         theme: "teal",
         totalRecords: 0,
         trashed: null,
+
+        usesync: false,
         usetrash: false,
     }),
 
@@ -219,6 +168,14 @@ export const usePageStore = defineStore("pageStore", {
             });
         },
 
+        clearFilters() {
+            this.search = null;
+            this.paramsCache.findBy = null;
+
+            this.filters = {};
+            this.paramsCache.filters = null;
+        },
+
         finduser() {
             this.$http(`account/login-finder`, {
                 method: "POST",
@@ -240,6 +197,20 @@ export const usePageStore = defineStore("pageStore", {
             this.auth = this.$storage.getItem("auth");
             this.checksum = this.$storage.getItem("checksum");
             this.modules = this.$storage.getItem("modules");
+
+            if (this.modules && "account" in this.modules) {
+                this.accountBase = this.modules.account[0];
+                this.appsMenus = this.accountBase.pages.reduce(
+                    (carry, page) => {
+                        if (page.side === true) {
+                            carry.push(page);
+                        }
+
+                        return carry;
+                    },
+                    []
+                );
+            }
 
             if (this.auth) {
                 this.theme = "theme" in this.auth ? this.auth.theme : "teal";
@@ -381,10 +352,56 @@ export const usePageStore = defineStore("pageStore", {
             }
         },
 
+        jsonReplacer(match, pIndent, pKey, pVal, pEnd) {
+            let key = "<span class=json-key>";
+            let val = "<span class=json-value>";
+            let str = "<span class=json-string>";
+            let r = pIndent || "";
+
+            if (pKey) r = r + key + pKey.replace(/[": ]/g, "") + "</span>: ";
+            if (pVal) r = r + (pVal[0] == '"' ? str : val) + pVal + "</span>";
+            return r + (pEnd || "");
+        },
+
+        jsonPrettyPrint(obj) {
+            let jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/gm;
+
+            return JSON.stringify(obj, null, 3)
+                .replace(/&/g, "&amp;")
+                .replace(/\\"/g, "&quot;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(jsonLine, this.jsonReplacer);
+        },
+
         getCreateData() {
-            this.combos = this.$storage.getItem("combos");
-            this.recordBase = this.$storage.getItem("recordBase");
-            this.record = JSON.parse(JSON.stringify(this.recordBase));
+            if (this.formState !== "create") {
+                this.formStateLast = JSON.parse(JSON.stringify(this.formState));
+                this.formState = "create";
+            }
+
+            if (!this.getdata) {
+                this.combos = this.$storage.getItem("combos");
+                this.recordBase = this.$storage.getItem("recordBase");
+                this.record = JSON.parse(JSON.stringify(this.recordBase));
+            } else {
+                const defaultParams = this.mapDefaultParams();
+
+                if (!defaultParams) {
+                    return;
+                }
+
+                let pagePath = this.buildPath + "/create";
+
+                this.$http(pagePath, {
+                    method: "GET",
+                    params: defaultParams,
+                })
+                    .then((response) => {
+                        this.mapResponseData(response);
+                    })
+                    .catch(() => this.mapPageDatasError());
+            }
 
             // if (Object.keys(this.record).length <= 0) {
             //     this.recordBase = this.$storage.getItem("recordBase");
@@ -403,9 +420,8 @@ export const usePageStore = defineStore("pageStore", {
                 `${
                     this.module.prefix ? this.module.prefix + "/" : ""
                 }api/dashboard`
-            ).then(({ record, pulse }) => {
+            ).then(({ record }) => {
                 this.record = record;
-                this.pulse = pulse;
 
                 if (typeof callback === "function") {
                     callback(record);
@@ -429,6 +445,10 @@ export const usePageStore = defineStore("pageStore", {
                     pagePath = `${this.buildPath}/${
                         this.$route.params[this.pageKey]
                     }`;
+                }
+
+                if (this.routePrefix) {
+                    pagePath = pagePath + this.routePrefix;
                 }
 
                 this.$http(pagePath, {
@@ -485,11 +505,28 @@ export const usePageStore = defineStore("pageStore", {
                 this.auth = response.auth;
                 this.checksum = response.checksum;
                 this.modules = response.modules;
-                this.theme = "theme" in this.auth ? this.auth.theme : "teal";
+                this.theme =
+                    this.auth && "theme" in this.auth
+                        ? this.auth.theme
+                        : "teal";
                 this.highlight =
-                    "highlight" in this.auth
+                    this.auth && "highlight" in this.auth
                         ? this.auth.highlight
                         : "deep-orange";
+
+                if (response.modules && "account" in response.modules) {
+                    this.accountBase = response.modules.account[0];
+                    this.appsMenus = this.accountBase.pages.reduce(
+                        (carry, page) => {
+                            if (page.side === true) {
+                                carry.push(page);
+                            }
+
+                            return carry;
+                        },
+                        []
+                    );
+                }
 
                 this.$storage.setItem("auth", response.auth);
                 this.$storage.setItem("checksum", response.checksum);
@@ -500,35 +537,47 @@ export const usePageStore = defineStore("pageStore", {
             });
         },
 
+        getUserDashboard() {
+            this.$http(`account/api/dashboard`).then((response) => {
+                this.mapResponseData(response);
+            });
+        },
+
         getUserModules() {
             if (!this.page || (this.page && this.page.slug !== this.pageName)) {
                 this.initPage();
             }
 
             this.$http(`account/api/user-modules`).then((response) => {
-                if ("auth" in response) {
-                    this.auth = response.auth;
-                    this.$storage.setItem("auth", response.auth);
-
-                    this.theme =
-                        "theme" in this.auth ? this.auth.theme : "teal";
-                }
-
-                if (
-                    "checksum" in response &&
-                    response.checksum !== this.checksum
-                ) {
-                    this.checksum = response.checksum;
-                    this.$storage.setItem("checksum", response.checksum);
-
-                    this.modules = response.modules;
-                    this.$storage.setItem("modules", response.modules);
-                }
+                this.mapUserModule(response);
             });
         },
 
+        mapUserModule(response) {
+            if ("auth" in response) {
+                this.auth = response.auth;
+                this.$storage.setItem("auth", response.auth);
+
+                this.theme = "theme" in this.auth ? this.auth.theme : "teal";
+            }
+
+            if ("checksum" in response && response.checksum !== this.checksum) {
+                this.checksum = response.checksum;
+                this.$storage.setItem("checksum", response.checksum);
+
+                this.modules = response.modules;
+                this.$storage.setItem("modules", response.modules);
+            }
+
+            this.impersonated = false;
+
+            if ("impersonated" in response) {
+                this.impersonated = true;
+            }
+        },
+
         mapResponseData(response) {
-            if ("data" in response) {
+            if ("data" in response || !("record" in response)) {
                 const { data, meta, setups } = response;
 
                 /** map meta */
@@ -545,6 +594,7 @@ export const usePageStore = defineStore("pageStore", {
                         headers,
                         icon,
                         key,
+                        parent,
                         recordBase,
                         usetrash,
                         statuses,
@@ -565,12 +615,17 @@ export const usePageStore = defineStore("pageStore", {
 
                     this.icon = icon;
                     this.key = key;
+
+                    this.parent =
+                        parent && Object.keys(parent).length > 0 ? parent : {};
+
                     this.logs = [];
                     this.recordBase =
                         recordBase && Object.keys(recordBase).length > 0
                             ? recordBase
                             : {};
                     this.record = JSON.parse(JSON.stringify(this.recordBase));
+
                     this.usetrash = usetrash ?? false;
                     this.statuses =
                         statuses && Object.keys(statuses).length > 0
@@ -588,13 +643,20 @@ export const usePageStore = defineStore("pageStore", {
                 /** map record */
                 if (this.isMobile) {
                     if (
+                        data &&
                         Object.keys(this.paramsCache).length > 0 &&
                         this.paramsCache.trashed === this.paramsOld.trashed &&
                         this.paramsCache.findBy === this.paramsOld.findBy &&
                         this.paramsCache.filters === this.paramsOld.filters
                     ) {
                         data.forEach((record) => {
-                            this.records.push(record);
+                            if (
+                                !this.records.find(
+                                    (rc) => rc[this.key] === record[this.key]
+                                )
+                            ) {
+                                this.records.push(record);
+                            }
                         });
                     } else {
                         this.records = data ?? [];
@@ -616,6 +678,7 @@ export const usePageStore = defineStore("pageStore", {
                         combos,
                         icon,
                         key,
+                        parent,
                         logs,
                         softdelete,
                         statuses,
@@ -626,6 +689,8 @@ export const usePageStore = defineStore("pageStore", {
                         combos && Object.keys(combos).length > 0 ? combos : {};
                     this.icon = icon;
                     this.key = key;
+                    this.parent =
+                        parent && Object.keys(parent).length > 0 ? parent : {};
                     this.logs = logs && Array.isArray(logs) ? logs : [];
                     this.softdelete = softdelete ?? false;
                     this.statuses =
@@ -763,20 +828,20 @@ export const usePageStore = defineStore("pageStore", {
             this.formStateLast = JSON.parse(JSON.stringify(this.formState));
             this.formState = "create";
 
-            if (this.sidenavState) {
-                this.sidenavState = false;
-
-                setTimeout(() => {
-                    this.$router.push({ name: this.page.slug + "-create" });
-                }, 300);
-            } else {
+            // if (this.sidenavState) {
+            //     this.sidenavState = false;
+            setTimeout(() => {
                 this.$router.push({ name: this.page.slug + "-create" });
-            }
+            }, 300);
+            // } else {
+            //     this.$router.push({ name: this.page.slug + "-create" });
+            // }
         },
 
         openFormData() {
             this.formStateLast = JSON.parse(JSON.stringify(this.formState));
             this.record = JSON.parse(JSON.stringify(this.recordBase));
+            // this.helpState = false;
 
             if (this.formState === "create") {
                 this.search = null;
@@ -870,7 +935,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
@@ -897,7 +964,11 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records[index] = record;
+                if (index !== -1) {
+                    Object.keys(record).forEach((key) => {
+                        this.records[index][key] = record[key];
+                    });
+                }
 
                 this.openFormData();
 
@@ -928,7 +999,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
@@ -959,7 +1032,9 @@ export const usePageStore = defineStore("pageStore", {
                     (rc) => rc[this.key] === record[this.key]
                 );
 
-                this.records.splice(index, 1);
+                if (index !== -1) {
+                    this.records.splice(index, 1);
+                }
 
                 this.openFormData();
 
@@ -993,6 +1068,15 @@ export const usePageStore = defineStore("pageStore", {
             }).then(() => {
                 //
             });
+        },
+
+        setHelpState(state) {
+            this.helpState = state;
+        },
+
+        setSidenavState(state) {
+            this.sidehelpState = false;
+            this.sidenavState = state;
         },
 
         setSelected(item) {

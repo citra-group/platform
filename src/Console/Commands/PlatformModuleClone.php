@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform\Console\Commands;
+namespace Citrapp\Platform\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -37,7 +37,10 @@ class PlatformModuleClone extends Command
         }
 
         $process = new Process([
-            'git', 'clone', $this->argument('repository'), $this->option('directory')
+            'git',
+            'clone',
+            $this->argument('repository'),
+            $this->option('directory')
         ]);
 
         $process->setWorkingDirectory(base_path() . DIRECTORY_SEPARATOR . 'modules');

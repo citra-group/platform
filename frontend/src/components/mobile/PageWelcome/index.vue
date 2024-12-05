@@ -1,88 +1,101 @@
 <template>
-    <v-main>
-        <div class="position-absolute" style="top: 0; width: 100%">
-            <v-sheet
-                class="rounded-b-xl"
-                :color="`${theme}-lighten-3`"
-                height="380"
-            ></v-sheet>
-        </div>
+	<v-layout :class="`bg-blue-grey-lighten-5`">
+		<v-main class="position-relative welcome-page playing">
+			<div class="wave"></div>
+			<div class="wave"></div>
+			<div class="wave"></div>
 
-        <v-sheet class="position-relative" color="transparent" height="100vh">
-            <v-card-text style="height: 100vh">
-                <v-card-text
-                    class="d-flex flex-column align-center justify-center mt-12 mb-4"
-                >
-                    <img
-                        src="/assets/pwa-192x192.png"
-                        style="height: 13vh; width: 12vh; position: absolute"
-                    />
-                </v-card-text>
+			<v-sheet
+				color="transparent"
+				class="mx-auto text-center position-relative px-8 pb-9"
+				height="100dvh"
+				width="100dvw"
+				style="padding-top: 216px !important"
+			>
+				<div
+					class="position-absolute d-flex flex-column align-center w-100"
+					style="left: 0; top: 48px"
+				>
+					<img
+						src="/assets/pwa-192x192.png"
+						style="height: auto; width: 72px"
+					/>
 
-                <v-card-text class="pb-2">
-                    <div class="text-h6 text-center mb-4">
-                        Selamat datang di
-                    </div>
+					<div class="mt-2 text-h4 font-brand">
+						CITR<span class="sub-color">PPS</span>
+					</div>
+				</div>
 
-                    <div class="text-h3 font-brand text-center">
-                        SiMAS<span class="text-red">TEN</span>
-                    </div>
+				<v-sheet
+					color="rgba(255, 255, 255, 0.95)"
+					rounded="lg"
+					class="mx-auto overflow-hidden pa-4"
+					width="100%"
+					height="auto"
+				>
+					<slot
+						:authenticate="authenticate"
+						:challenge="challenge"
+						:finduser="finduser"
+						:resetpass="resetpass"
+					></slot>
+				</v-sheet>
+			</v-sheet>
 
-                    <div class="text-overline text-center">
-                        <small>versi 3.0</small>
-                    </div>
-                </v-card-text>
-
-                <!-- d-flex flex-column align-center justify-center  -->
-                <v-sheet
-                    elevation="6"
-                    rounded="lg"
-                    class="mx-auto overflow-hidden"
-                    max-width="343"
-                    height="384"
-                >
-                    <slot
-                        :authenticate="authenticate"
-                        :challenge="challenge"
-                        :finduser="finduser"
-                        :resetpass="resetpass"
-                    ></slot>
-                </v-sheet>
-            </v-card-text>
-        </v-sheet>
-    </v-main>
+			<v-sheet
+				color="transparent"
+				class="position-absolute w-100"
+				style="bottom: 0px"
+			>
+				<v-row no-gutters>
+					<v-col cols="12">
+						<div
+							class="d-flex justify-center text-grey-darken-1 pb-2"
+						>
+							<div class="text-caption text-uppercase">
+								version 3.0.0
+							</div>
+							<div class="ml-4 text-caption text-uppercase">
+								Team Citra &copy; 2024
+							</div>
+						</div>
+					</v-col>
+				</v-row>
+			</v-sheet>
+		</v-main>
+	</v-layout>
 </template>
 
 <script>
 import { usePageStore } from "@pinia/pageStore";
 
 export default {
-    name: "PageWelcome",
+	name: "PageWelcome",
 
-    setup() {
-        const store = usePageStore();
+	setup() {
+		const store = usePageStore();
 
-        const {
-            authenticate,
-            challenge,
-            finduser,
-            getSanctumCSRF,
-            resetpass,
-            theme,
-        } = store;
+		const {
+			authenticate,
+			challenge,
+			finduser,
+			getSanctumCSRF,
+			resetpass,
+			theme,
+		} = store;
 
-        return {
-            authenticate,
-            challenge,
-            finduser,
-            getSanctumCSRF,
-            resetpass,
-            theme,
-        };
-    },
+		return {
+			authenticate,
+			challenge,
+			finduser,
+			getSanctumCSRF,
+			resetpass,
+			theme,
+		};
+	},
 
-    created() {
-        this.getSanctumCSRF({ mobile: true });
-    },
+	created() {
+		this.getSanctumCSRF({ mobile: true });
+	},
 };
 </script>

@@ -1,6 +1,15 @@
 <template>
-    <v-toolbar :color="theme">
-        <v-btn icon @click="openFormData">
+    <v-app-bar
+        :color="`${theme}`"
+        scroll-behavior="elevate"
+        scroll-threshold="87"
+    >
+        <v-btn
+            icon
+            @click="
+                navbackTo ? $router.push({ name: navbackTo }) : openFormData()
+            "
+        >
             <v-icon class="with-shadow">arrow_back</v-icon>
         </v-btn>
 
@@ -15,9 +24,7 @@
                 <v-icon class="with-shadow">restore</v-icon>
 
                 <form-confirm icon="restore" title="pulihkan">
-                    <v-card-text>
-                        Proses ini akan memulihkan data ini dari status trashed.
-                    </v-card-text>
+                    Proses ini akan memulihkan data ini dari status trashed.
 
                     <template v-slot:actions="{ isActive }">
                         <v-spacer></v-spacer>
@@ -45,10 +52,8 @@
                 <v-icon class="with-shadow">delete_forever</v-icon>
 
                 <form-confirm icon="delete_forever" title="Hapus Permanen?">
-                    <v-card-text>
-                        Proses ini akan menghapus data secara permanen, proses
-                        ini tidak dapat di pulihkan setelah di lakukan.
-                    </v-card-text>
+                    Proses ini akan menghapus data secara permanen, proses ini
+                    tidak dapat di pulihkan setelah di lakukan.
 
                     <template v-slot:actions="{ isActive }">
                         <v-spacer></v-spacer>
@@ -85,41 +90,54 @@
             <v-btn v-if="!hideDelete" color="orange" icon>
                 <v-icon class="with-shadow">delete</v-icon>
 
-                <v-dialog activator="parent" max-width="360" persistent>
-                    <template v-slot:default="{ isActive }">
-                        <v-card
-                            prepend-icon="delete"
-                            text="Proses ini akan juga menghapus semua data yang terkait pada data ini."
-                            title="Hapus data ini?"
-                        >
-                            <template v-slot:actions>
-                                <v-spacer></v-spacer>
+                <form-confirm icon="delete" title="Hapus data ini?">
+                    Proses ini akan juga menghapus semua data yang terkait pada
+                    data ini.
 
+                    <template v-slot:actions="{ isActive }">
+                        <v-row dense>
+                            <v-col cols="6">
                                 <v-btn
-                                    color="grey"
-                                    text="Batal"
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="outlined"
+                                    block
                                     @click="isActive.value = false"
-                                ></v-btn>
+                                    >BATAL</v-btn
+                                >
+                            </v-col>
 
+                            <v-col cols="6">
                                 <v-btn
-                                    color="deep-orange"
-                                    text="Hapus"
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="flat"
+                                    block
                                     @click="
                                         postFormDelete(
                                             () => (isActive.value = false)
                                         )
                                     "
-                                ></v-btn>
-                            </template>
-                        </v-card>
+                                    >HAPUS</v-btn
+                                >
+                            </v-col>
+                        </v-row>
                     </template>
-                </v-dialog>
+                </form-confirm>
 
                 <v-tooltip activator="parent" location="bottom"
                     >Hapus</v-tooltip
                 >
             </v-btn>
         </template>
+
+        <slot
+            name="toolbar"
+            :record="record"
+            :theme="theme"
+            :statuses="statuses"
+            :store="store"
+        ></slot>
 
         <v-btn
             v-if="withHelpdesk"
@@ -141,96 +159,101 @@
                 >Informasi</v-tooltip
             >
         </v-btn>
-    </v-toolbar>
+    </v-app-bar>
 
     <v-sheet
         :color="`${theme}`"
-        class="mx-auto position-absolute w-100 rounded-b-xl"
-        height="192"
+        class="mx-auto position-fixed w-100 rounded-b-xl"
+        height="256"
     ></v-sheet>
 
-    <v-responsive
-        height="calc(100vh - 64px)"
-        class="bg-transparent overflow-x-hidden overflow-y-auto px-4"
-        content-class="position-relative"
-    >
-        <v-sheet
-            class="position-absolute text-center w-100 pt-1"
-            color="transparent"
-            style="z-index: 1"
-        >
-            <div class="d-flex justify-center position-relative">
-                <v-sheet :color="`${theme}`" elevation="4" rounded="pill">
-                    <v-card-text class="pa-1">
-                        <v-avatar
-                            :color="`${highlight}-lighten-2`"
-                            size="52"
-                            style="font-size: 22px"
+    <v-main>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
+            >
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
+
+                    <div
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
+                        style="
+                            top: 8px;
+                            left: 0;
+                            font-size: 0.63rem !important;
+                            width: calc(50% - 30px);
+                        "
+                    >
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
                         >
-                            <v-icon :color="`${theme}-darken-1`">{{
-                                page.icon
-                            }}</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-sheet>
+                            {{ title }}
+                        </div>
+                    </div>
 
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
-                    style="
-                        top: 8px;
-                        left: 0;
-                        font-size: 0.63rem !important;
-                        width: calc(50% - 30px);
-                    "
-                >
                     <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
+                        v-if="!hideDataTag"
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
                     >
-                        {{ title }}
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            show: {{ record[key] }}
+                        </div>
                     </div>
                 </div>
+            </v-sheet>
 
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
-                    style="
-                        font-size: 0.63rem !important;
-                        top: 8px;
-                        right: 0;
-                        width: calc(50% - 30px);
-                    "
-                >
-                    <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
-                    >
-                        show: {{ record[key] }}
-                    </div>
-                </div>
-            </div>
+            <v-sheet
+                class="position-relative pt-7"
+                elevation="1"
+                min-height="calc(100dvh - 116px)"
+                rounded="lg"
+                flat
+            >
+                <slot
+                    :combos="combos"
+                    :mapResponseData="mapResponseData"
+                    :record="record"
+                    :theme="theme"
+                    :store="store"
+                    :statuses="statuses"
+                ></slot>
+            </v-sheet>
         </v-sheet>
-
-        <v-sheet
-            class="mt-9 pt-7"
-            min-height="200px"
-            elevation="1"
-            rounded="lg"
-        >
-            <slot :combos="combos" :record="record" :theme="theme"></slot>
-        </v-sheet>
-
-        <div class="py-2"></div>
-    </v-responsive>
+    </v-main>
 
     <form-help mode="show" :withActivityLogs="withActivityLogs">
-        <template v-slot:forminfo>
-            <slot name="forminfo" :theme="theme"></slot>
+        <template v-slot:feed>
+            <slot name="feed" :theme="theme"></slot>
         </template>
 
-        <template v-slot:helpdesk>
-            <slot name="helpdesk" :record="record" :theme="theme"></slot>
+        <template v-slot:info>
+            <slot
+                name="info"
+                :mapResponseData="mapResponseData"
+                :record="record"
+                :theme="theme"
+                :store="store"
+                :statuses="statuses"
+            ></slot>
+        </template>
+
+        <template v-slot:icon>
+            <slot name="icon" :theme="theme"></slot>
         </template>
     </form-help>
 </template>
@@ -248,7 +271,10 @@ export default {
         contentClass: String,
         dataFromStore: Boolean,
         hideEdit: Boolean,
+        hideDataTag: Boolean,
         hideDelete: Boolean,
+        navbackTo: String,
+        routePrefix: String,
         width: {
             type: String,
             default: "500px",
@@ -262,6 +288,8 @@ export default {
 
         store.beforePost = props.beforePost;
         store.activityLog = props.withActivityLogs;
+        store.routePrefix = props.routePrefix;
+        store.navigationState = false;
 
         const {
             combos,
@@ -272,6 +300,7 @@ export default {
             page,
             pageKey,
             softdelete,
+            statuses,
             record,
             theme,
             title,
@@ -279,6 +308,7 @@ export default {
 
         const {
             getPageData,
+            mapResponseData,
             openFormData,
             openFormEdit,
             postFormDelete,
@@ -296,20 +326,28 @@ export default {
             pageKey,
             record,
             softdelete,
+            statuses,
             theme,
             title,
 
             getPageData,
+            mapResponseData,
             openFormData,
             openFormEdit,
             postFormDelete,
             postFormForceDelete,
             postFormRestore,
+
+            store,
         };
     },
 
     mounted() {
         this.getPageData(this.dataFromStore);
+    },
+
+    beforeUnmount() {
+        this.navigationState = true;
     },
 };
 </script>

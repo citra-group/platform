@@ -1,6 +1,6 @@
 <?php
 
-namespace CitraGroup\Platform\Console\Commands;
+namespace Citrapp\Platform\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -144,8 +144,8 @@ class PlatformMakeModule extends Command
 
         $this->modulePath = base_path(
             'modules' .
-            DIRECTORY_SEPARATOR .
-            str($this->moduleName)->lower()->toString()
+                DIRECTORY_SEPARATOR .
+                str($this->moduleName)->lower()->toString()
         );
 
         /** GENERATE FOLDER */

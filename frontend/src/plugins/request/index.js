@@ -9,16 +9,36 @@ export function RequestInstance(url, options) {
 	 */
 	if (localStorage.getItem("baseURL") === null) {
 		if (import.meta.env.VITE_APP_BACKEND) {
-			localStorage.setItem("baseURL", `${import.meta.env.VITE_APP_PROTOCOL + "://" + import.meta.env.VITE_APP_BACKEND + import.meta.env.VITE_APP_DOMAIN}`);
+			localStorage.setItem(
+				"baseURL",
+				`${
+					import.meta.env.VITE_APP_PROTOCOL +
+					"://" +
+					import.meta.env.VITE_APP_BACKEND +
+					import.meta.env.VITE_APP_DOMAIN
+				}`
+			);
 		} else {
-			localStorage.setItem("baseURL", `${import.meta.env.VITE_APP_PROTOCOL + "://" + import.meta.env.VITE_APP_DOMAIN}`);
+			localStorage.setItem(
+				"baseURL",
+				`${
+					import.meta.env.VITE_APP_PROTOCOL +
+					"://" +
+					import.meta.env.VITE_APP_DOMAIN
+				}`
+			);
 		}
 	}
 
 	let baseURL = null;
 
 	if ("module" in store && "domain" in store.module) {
-		baseURL = `${import.meta.env.VITE_APP_PROTOCOL + "://" + store.module.domain + import.meta.env.VITE_APP_DOMAIN}`;
+		baseURL = `${
+			import.meta.env.VITE_APP_PROTOCOL +
+			"://" +
+			store.module.domain +
+			import.meta.env.VITE_APP_DOMAIN
+		}`;
 	} else {
 		baseURL = localStorage.getItem("baseURL");
 	}
@@ -63,7 +83,10 @@ export function RequestInstance(url, options) {
 	/**
 	 * check for method === POST or responseType === blob
 	 */
-	if (defaultOptions.method === "POST" && defaultOptions.responseType === "blob") {
+	if (
+		defaultOptions.method === "POST" &&
+		defaultOptions.responseType === "blob"
+	) {
 		defaultOptions.headers["Content-Type"] = "multipart/form-data";
 	}
 
@@ -74,15 +97,18 @@ export function RequestInstance(url, options) {
 	axios.defaults.withXSRFToken = true;
 
 	if (store.$storage.getItem("token") !== null) {
-		defaultOptions.headers["Authorization"] = "Bearer " + store.$storage.getItem("token");
+		defaultOptions.headers["Authorization"] =
+			"Bearer " + store.$storage.getItem("token");
 	}
 
 	/**
 	 * construct the request
 	 */
 	let request = null;
+	let htmlTag = document.getElementsByTagName("html");
 
 	store.overlay = true;
+	htmlTag[0].style.overflowY = "hidden";
 
 	switch (defaultOptions.method) {
 		case "DELETE":
@@ -129,6 +155,7 @@ export function RequestInstance(url, options) {
 	return request
 		.then((response) => {
 			store.overlay = false;
+			htmlTag[0].style.overflowY = "scroll";
 
 			let { status, message } = response.data;
 
@@ -142,6 +169,7 @@ export function RequestInstance(url, options) {
 		})
 		.catch((error) => {
 			store.overlay = false;
+			htmlTag[0].style.overflowY = "scroll";
 
 			let status = error.response ? error.response.status : error.status;
 

@@ -1,8 +1,6 @@
 <template>
     <v-layout :class="`bg-${theme}-lighten-4`">
-        <v-main>
-            <router-view key="pagebase" />
-        </v-main>
+        <router-view key="pagebase" />
 
         <v-overlay
             :model-value="overlay"
@@ -20,7 +18,12 @@
             </v-progress-circular>
         </v-overlay>
 
-        <v-snackbar :color="snackbar.color" v-model="snackbar.state" multi-line>
+        <v-snackbar
+            :color="snackbar.color"
+            :timeout="1500"
+            v-model="snackbar.state"
+            multi-line
+        >
             {{ snackbar.text }}
 
             <template v-slot:actions>
@@ -43,7 +46,7 @@
                 v-for="(item, index) in sideMenus"
                 :key="index"
                 style="width: 25%"
-                :to="{ name: item.slug }"
+                @click="openPage(item)"
             >
                 <v-icon>{{ item.icon }}</v-icon>
 
@@ -102,18 +105,25 @@ export default {
         return {
             auth,
             dockMenus,
-            initModule,
             navigationState,
             overlay,
             railMode,
             sideMenus,
             snackbar,
             theme,
+
+            initModule,
         };
     },
 
     created() {
         this.initModule({ mobile: true });
+    },
+
+    methods: {
+        openPage: function (page) {
+            this.$router.push({ name: page.slug });
+        },
     },
 };
 </script>

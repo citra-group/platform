@@ -1,22 +1,31 @@
 <template>
-    <v-toolbar :color="theme">
+    <v-app-bar
+        :color="`${theme}`"
+        scroll-behavior="hide elevate"
+        scroll-threshold="87"
+    >
         <v-btn
             icon
-            v-if="parentName"
-            @click="$router.push({ name: parentName })"
+            v-if="parentName || navbackTo"
+            @click="
+                navbackTo
+                    ? $router.push({ name: navbackTo })
+                    : $router.push({ name: parentName })
+            "
         >
             <v-icon>arrow_back</v-icon>
         </v-btn>
 
         <v-toolbar-title class="text-body-2 font-weight-bold text-uppercase">{{
-            module.name
+            page.name ?? module.name
         }}</v-toolbar-title>
 
-        <v-spacer></v-spacer>
+        <slot name="toolbar" :statuses="statuses" :theme="theme" :store="store">
+        </slot>
 
         <v-btn
-            v-if="!disableCreate && !hasSelected"
-            :color="highlight"
+            v-if="!hideCreate && !hasSelected"
+            :color="`${highlight}-lighten-5`"
             icon
             @click="openFormCreate"
         >
@@ -31,149 +40,148 @@
         >
             <v-icon class="with-shadow">filter_list</v-icon>
         </v-btn>
-    </v-toolbar>
+    </v-app-bar>
 
     <v-sheet
         :color="`${theme}`"
-        class="mx-auto position-absolute w-100 rounded-b-xl"
-        height="192"
+        class="mx-auto position-fixed w-100 rounded-b-xl"
+        height="256"
     ></v-sheet>
 
-    <v-responsive
-        :height="navigationState ? `calc(100vh - 120px)` : `calc(100vh - 64px)`"
-        class="bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-        content-class="position-relative"
-    >
-        <v-sheet
-            class="position-absolute text-center w-100 pt-1"
-            color="transparent"
-            style="z-index: 1"
-        >
-            <div class="d-flex justify-center position-relative">
-                <v-sheet :color="`${theme}`" elevation="4" rounded="pill">
-                    <v-card-text class="pa-1">
-                        <v-avatar
-                            :color="`${highlight}-lighten-2`"
-                            size="52"
-                            style="font-size: 22px"
-                        >
-                            <v-icon :color="`${theme}-darken-1`">{{
-                                page.icon
-                            }}</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-sheet>
-
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
-                    style="
-                        top: 8px;
-                        left: 0;
-                        font-size: 0.63rem !important;
-                        width: calc(50% - 30px);
-                    "
-                >
-                    <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
-                    >
-                        {{ title }}
-                    </div>
-                </div>
-
-                <div
-                    :class="`text-${theme}-lighten-4`"
-                    class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
-                    style="
-                        font-size: 0.63rem !important;
-                        top: 8px;
-                        right: 0;
-                        width: calc(50% - 30px);
-                    "
-                >
-                    <div
-                        class="d-inline-block text-truncate"
-                        style="max-width: 100%"
-                    >
-                        {{ page.title }}
-                    </div>
-                </div>
-            </div>
-        </v-sheet>
-
-        <v-sheet
-            class="mt-9 pt-7"
-            elevation="1"
-            rounded="lg"
-            min-height="calc(100% - 44px)"
-        >
-            <v-list
-                class="bg-transparent"
-                :active-class="
-                    showDelete
-                        ? `bg-white elevation-4 text-grey with-delete`
-                        : `bg-white elevation-4 text-grey`
-                "
-                lines="two"
-                selectable
-                @update:selected="setSelected"
+    <v-main>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
             >
-                <template v-for="(record, index) in records">
-                    <slot
-                        name="mobile"
-                        :index="index"
-                        :record="record"
-                        :showDelete="showDelete"
-                        :theme="theme"
-                    >
-                        <item-data
-                            :chip="chip"
-                            :show-delete="showDelete"
-                            :value="record"
-                        ></item-data>
-                    </slot>
-                </template>
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
 
-                <template v-if="records.length <= 0">
-                    <slot>
-                        <div
-                            class="d-flex align-center justify-center text-body-2 text-center text-grey"
-                            style="height: calc(100vh - 208px)"
-                        >
-                            Data tidak ditemukan
-                        </div>
-                    </slot>
-                </template>
-
-                <template v-else>
                     <div
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-left"
+                        style="
+                            top: 8px;
+                            left: 0;
+                            font-size: 0.63rem !important;
+                            width: calc(50% - 30px);
+                        "
+                    >
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            {{ title }}
+                        </div>
+                    </div>
+
+                    <div
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
+                    >
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            SEMUA DATA
+                        </div>
+                    </div>
+                </div>
+            </v-sheet>
+
+            <v-sheet
+                :min-height="
+                    parentName || navbackTo
+                        ? `calc(100dvh - 116px)`
+                        : `calc(100dvh - 172px)`
+                "
+                class="position-relative pt-7"
+                elevation="1"
+                rounded="lg"
+                flat
+            >
+                <v-list
+                    class="bg-transparent overflow-y-auto overflow-x-hidden scrollbar-none"
+                    :active-class="
+                        showDelete
+                            ? `bg-white elevation-6 text-grey with-delete`
+                            : `bg-white elevation-6 text-grey`
+                    "
+                    lines="two"
+                    selectable
+                    @update:selected="setSelected"
+                >
+                    <template v-for="(record, index) in records">
+                        <slot
+                            name="mobileRow"
+                            :index="index"
+                            :record="record"
+                            :showDelete="showDelete"
+                            :theme="theme"
+                        >
+                            <item-data
+                                :chip="chip"
+                                :subtitle="subtitle"
+                                :show-delete="showDelete"
+                                :value="record"
+                            ></item-data>
+                        </slot>
+                    </template>
+
+                    <template v-if="records.length <= 0">
+                        <slot name="not-found">
+                            <div
+                                class="d-flex align-center justify-center text-body-2 text-center text-grey"
+                                style="height: calc(100dvh - 216px)"
+                            >
+                                Data tidak ditemukan
+                            </div>
+                        </slot>
+                    </template>
+
+                    <template
                         v-if="
                             meta.current_page &&
                             meta.current_page < meta.last_page
                         "
-                        class="d-flex align-center justify-center py-2"
-                        style="width: 100%"
-                        v-intersect="onIntersect"
-                    ></div>
-                </template>
-            </v-list>
+                    >
+                        <v-list-item v-intersect="onIntersect"></v-list-item>
+                    </template>
+                </v-list>
+            </v-sheet>
         </v-sheet>
+    </v-main>
 
-        <div class="py-2"></div>
-    </v-responsive>
-
-    <page-filter>
-        <template v-slot:forminfo>
-            <slot name="forminfo" :theme="theme"></slot>
+    <page-filter :withSync="withSync">
+        <template v-slot:syncdata="{ mapResponseData, parent }">
+            <slot
+                name="syncdata"
+                :mapResponseData="mapResponseData"
+                :params="params"
+                :parent="parent"
+                :store="store"
+                :theme="theme"
+            ></slot>
         </template>
 
-        <template v-slot:helpdesk>
-            <slot name="helpdesk" :theme="theme"></slot>
+        <template v-slot:feed>
+            <slot name="feed" :store="store" :theme="theme"></slot>
         </template>
 
-        <template v-slot:utility>
-            <slot name="utility" :theme="theme"></slot>
+        <template v-slot:info>
+            <slot name="info" :store="store" :theme="theme"></slot>
+        </template>
+
+        <template v-slot:filter>
+            <slot name="filter" :store="store" :theme="theme"></slot>
         </template>
     </page-filter>
 </template>
@@ -186,23 +194,36 @@ export default {
     name: "form-data",
 
     props: {
+        navbackTo: String,
+
         chip: {
             type: String,
             default: "chip",
         },
 
-        disableCreate: Boolean,
+        hideCreate: Boolean,
+
+        subtitle: {
+            type: String,
+            default: "subtitle",
+        },
 
         showDelete: {
             type: Boolean,
             default: false,
         },
+
+        withSync: Boolean,
     },
 
-    setup() {
+    setup(props) {
         const store = usePageStore();
 
         store.helpState = false;
+
+        if (store.parentName || props.navbackTo) {
+            store.navigationState = false;
+        }
 
         const {
             formStateLast,
@@ -220,6 +241,7 @@ export default {
             parentName,
             records,
             railMode,
+            statuses,
             sidenavState,
             selected,
             title,
@@ -246,6 +268,7 @@ export default {
             parentName,
             records,
             railMode,
+            statuses,
             sidenavState,
             selected,
             title,
@@ -256,7 +279,15 @@ export default {
             openFormCreate,
             openFormShow,
             setSelected,
+
+            store,
         };
+    },
+
+    beforeUnmount() {
+        if (this.parentName || this.navbackTo) {
+            this.navigationState = true;
+        }
     },
 
     methods: {

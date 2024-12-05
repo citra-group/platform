@@ -1,6 +1,10 @@
 <template>
-    <v-toolbar :color="theme">
-        <v-btn icon>
+    <v-app-bar
+        :color="theme"
+        scroll-behavior="hide elevate"
+        scroll-threshold="87"
+    >
+        <v-btn icon v-if="parentName">
             <v-icon>arrow_back</v-icon>
         </v-btn>
 
@@ -9,29 +13,80 @@
         }}</v-toolbar-title>
 
         <v-spacer></v-spacer>
-    </v-toolbar>
+
+        <v-btn icon @click="sidenavState = !sidenavState">
+            <v-icon>filter_list</v-icon>
+        </v-btn>
+    </v-app-bar>
+
+    <page-sidenav :title="sidenavTitle">
+        <template v-slot:info>
+            <slot
+                name="info"
+                :combos="combos"
+                :record="record"
+                :statuses="statuses"
+                :theme="theme"
+                :store="store"
+            ></slot>
+        </template>
+    </page-sidenav>
 
     <v-sheet
         :color="`${theme}`"
-        class="mx-auto position-absolute w-100 rounded-b-xl"
-        height="192"
+        class="mx-auto position-fixed w-100 rounded-b-xl"
+        height="256"
     ></v-sheet>
 
-    <v-responsive
-        :height="navigationState ? `calc(100vh - 120px)` : `calc(100vh - 64px)`"
-        class="bg-transparent overflow-x-hidden overflow-y-auto px-4"
-        content-class="position-relative"
-    >
-        <slot
-            :combos="combos"
-            :highlight="highlight"
-            :record="record"
-            :store="store"
-            :theme="theme"
-        ></slot>
+    <v-main>
+        <v-sheet class="bg-transparent position-relative px-4 pt-9 pb-4">
+            <v-sheet
+                class="position-absolute"
+                color="transparent"
+                width="calc(100% - 32px)"
+                style="top: 0; z-index: 1"
+            >
+                <div class="d-flex justify-center">
+                    <form-icon></form-icon>
 
-        <div class="py-2"></div>
-    </v-responsive>
+                    <div
+                        :class="`text-${theme}-lighten-4`"
+                        class="text-caption text-white position-absolute font-weight-bold text-uppercase pt-1 text-right"
+                        style="
+                            font-size: 0.63rem !important;
+                            top: 8px;
+                            right: 0;
+                            width: calc(50% - 30px);
+                        "
+                    >
+                        <div
+                            class="d-inline-block text-truncate"
+                            style="max-width: 100%"
+                        >
+                            {{ page.name }}
+                        </div>
+                    </div>
+                </div>
+            </v-sheet>
+
+            <v-sheet
+                class="position-relative pt-7"
+                elevation="1"
+                min-height="calc(100dvh - 172px)"
+                rounded="lg"
+                flat
+            >
+                <slot
+                    :combos="combos"
+                    :highlight="highlight"
+                    :record="record"
+                    :statuses="statuses"
+                    :store="store"
+                    :theme="theme"
+                ></slot>
+            </v-sheet>
+        </v-sheet>
+    </v-main>
 </template>
 
 <script>
@@ -43,9 +98,11 @@ export default {
 
     props: {
         maxWidth: {
-            type: String,
-            default: "500px",
+            type: [String, Number],
+            default: "500",
         },
+
+        navbackTo: String,
 
         pagePath: {
             type: String,
@@ -62,7 +119,24 @@ export default {
             default: null,
         },
 
-        withProperty: {
+        parentName: {
+            type: String,
+            default: null,
+        },
+
+        parentKey: {
+            type: String,
+            default: null,
+        },
+
+        sidenavTitle: {
+            type: String,
+            default: "Utility",
+        },
+
+        title: String,
+
+        showSidenav: {
             type: Boolean,
             default: false,
         },
@@ -81,6 +155,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,
@@ -95,6 +170,7 @@ export default {
             module,
             navigationState,
             page,
+            statuses,
             sidenavState,
             railMode,
             record,

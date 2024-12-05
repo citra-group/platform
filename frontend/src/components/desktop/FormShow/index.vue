@@ -1,229 +1,193 @@
 <template>
-    <v-sheet color="transparent" class="position-relative">
-        <v-toolbar :color="theme">
-            <v-btn icon="arrow_back" @click="openFormData"></v-btn>
-
-            <v-toolbar-title
-                class="text-body-2 font-weight-bold text-uppercase"
-                >{{ page.name }}</v-toolbar-title
-            >
-
-            <v-spacer></v-spacer>
-
-            <template v-if="softdelete">
-                <v-btn icon>
-                    <v-icon>restore</v-icon>
-
-                    <form-confirm
-                        icon="restore"
-                        title="pemulihan"
-                        message="Proses ini akan memulihkan data ini dari status trashed."
-                    >
-                        <template v-slot:actions="{ isActive }">
-                            <v-spacer></v-spacer>
-
-                            <v-btn
-                                :color="`${theme}-lighten-2`"
-                                class="text-white mr-2"
-                                variant="flat"
-                                @click="isActive.value = false"
-                                >batal</v-btn
-                            >
-
-                            <v-btn
-                                :color="`${theme}`"
-                                class="text-white"
-                                variant="flat"
-                                @click="
-                                    postFormRestore(
-                                        () => (isActive.value = false)
-                                    )
-                                "
-                                >Pulihkan</v-btn
-                            >
-                        </template>
-                    </form-confirm>
-
-                    <v-tooltip activator="parent" location="bottom"
-                        >Pulihkan</v-tooltip
-                    >
-                </v-btn>
-
-                <v-btn color="orange" icon>
-                    <v-icon>delete_forever</v-icon>
-
-                    <form-confirm
-                        icon="delete_forever"
-                        title="hapus permanent"
-                        message="Proses ini akan menghapus data secara permanen, proses ini tidak dapat di pulihkan setelah di lakukan."
-                    >
-                        <template v-slot:actions="{ isActive }">
-                            <v-spacer></v-spacer>
-
-                            <v-btn
-                                :color="`${theme}-lighten-2`"
-                                class="text-white mr-2"
-                                variant="flat"
-                                @click="isActive.value = false"
-                                >batal</v-btn
-                            >
-
-                            <v-btn
-                                :color="`${theme}`"
-                                class="text-white"
-                                variant="flat"
-                                @click="
-                                    postFormForceDelete(
-                                        () => (isActive.value = false)
-                                    )
-                                "
-                                >Hapus</v-btn
-                            >
-                        </template>
-                    </form-confirm>
-
-                    <v-tooltip activator="parent" location="bottom"
-                        >Hapuskan</v-tooltip
-                    >
-                </v-btn>
-            </template>
-
-            <template v-else>
-                <v-btn v-if="!hideEdit" icon @click="openFormEdit">
-                    <v-icon>edit</v-icon>
-
-                    <v-tooltip activator="parent" location="bottom"
-                        >Ubah</v-tooltip
-                    >
-                </v-btn>
-
-                <v-btn v-if="!hideDelete" color="orange" icon>
-                    <v-icon>delete</v-icon>
-
-                    <form-confirm
-                        icon="delete"
-                        title="hapus"
-                        message="Proses ini akan juga menghapus semua data yang terkait pada data ini."
-                    >
-                        <template v-slot:actions="{ isActive }">
-                            <v-spacer></v-spacer>
-
-                            <v-btn
-                                :color="`${theme}-lighten-2`"
-                                class="text-white mr-2"
-                                variant="flat"
-                                @click="isActive.value = false"
-                                >batal</v-btn
-                            >
-
-                            <v-btn
-                                :color="`${theme}`"
-                                class="text-white"
-                                variant="flat"
-                                @click="
-                                    postFormDelete(
-                                        () => (isActive.value = false)
-                                    )
-                                "
-                                >Hapus</v-btn
-                            >
-                        </template>
-                    </form-confirm>
-
-                    <v-tooltip activator="parent" location="bottom"
-                        >Hapus</v-tooltip
-                    >
-                </v-btn>
-            </template>
-
-            <v-btn
-                v-if="withHelpdesk"
-                :color="helpState ? 'white' : `${theme}-lighten-3`"
-                icon
-                @click="helpState = !helpState"
-            >
-                <v-icon
-                    :style="
-                        helpState
-                            ? 'transform: rotate(180deg)'
-                            : 'transform: rotate(0deg)'
-                    "
-                    >menu_open</v-icon
-                >
-
-                <v-tooltip activator="parent" location="bottom"
-                    >Informasi</v-tooltip
-                >
-            </v-btn>
-        </v-toolbar>
-
-        <v-sheet
-            :color="`${theme}-lighten-4`"
-            class="mx-auto position-absolute w-100"
-            height="100%"
-        ></v-sheet>
-
-        <v-sheet
-            :color="`${theme}`"
-            class="mx-auto position-absolute w-100 rounded-b-xl"
-            height="192"
-        ></v-sheet>
-
-        <v-sheet
-            class="position-relative bg-transparent overflow-x-hidden overflow-y-auto scrollbar-none px-4"
-            height="calc(100vh - 72px)"
-            width="100%"
+    <v-app-bar
+        :color="`${theme}-lighten-5`"
+        :order="1"
+        height="72"
+        scroll-behavior="elevate"
+        scroll-threshold="87"
+    >
+        <v-btn
+            icon
+            @click="
+                navbackTo ? $router.push({ name: navbackTo }) : openFormData()
+            "
         >
-            <div
-                class="position-absolute text-center"
-                style="width: calc(100% - 32px); z-index: 1"
-            >
-                <div
-                    :style="`max-width: ${maxWidth}`"
-                    class="d-flex flex-column align-center justify-center position-relative mx-auto"
-                >
-                    <v-card :color="`${theme}`" rounded="pill">
-                        <v-card-text class="pa-1">
-                            <v-avatar
-                                :color="`${highlight}-lighten-2`"
-                                size="64"
-                                style="font-size: 22px"
-                            >
-                                <v-icon :color="`${theme}-darken-1`">{{
-                                    page.icon
-                                }}</v-icon>
-                            </v-avatar>
-                        </v-card-text>
-                    </v-card>
+            <v-icon>arrow_back</v-icon>
+        </v-btn>
 
-                    <div
-                        :class="`text-${theme}-lighten-4`"
-                        class="text-caption text-white position-absolute pt-3 font-weight-bold text-uppercase"
-                        style="top: 0; right: 0"
-                    >
-                        show
-                    </div>
-                </div>
-            </div>
+        <v-toolbar-title class="text-body-2 font-weight-bold text-uppercase">{{
+            page.name
+        }}</v-toolbar-title>
 
-            <v-sheet
-                :style="`max-width: ${maxWidth}`"
-                class="mt-9 pt-9 mx-auto"
-                min-height="calc(100vh - 175px)"
-                rounded="lg"
-            >
-                <slot :combos="combos" :record="record" :theme="theme"></slot>
-            </v-sheet>
-        </v-sheet>
-    </v-sheet>
+        <v-spacer></v-spacer>
 
-    <form-help mode="show" :withActivityLogs="withActivityLogs">
-        <template v-slot:forminfo>
-            <slot name="forminfo" :theme="theme"></slot>
+        <template v-if="softdelete">
+            <v-btn icon>
+                <v-icon>restore</v-icon>
+
+                <form-confirm icon="restore" title="pulihkan">
+                    Proses ini akan memulihkan data ini dari status trashed.
+
+                    <template v-slot:actions="{ isActive }">
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            :color="`${theme}-lighten-2`"
+                            class="text-white mr-2"
+                            variant="flat"
+                            @click="isActive.value = false"
+                            >batal</v-btn
+                        >
+
+                        <v-btn
+                            color="deep-orange"
+                            text="Pulihkan"
+                            @click="
+                                postFormRestore(() => (isActive.value = false))
+                            "
+                        ></v-btn>
+                    </template>
+                </form-confirm>
+            </v-btn>
+
+            <v-btn color="orange" icon>
+                <v-icon>delete_forever</v-icon>
+
+                <form-confirm icon="delete_forever" title="Hapus Permanen?">
+                    Proses ini akan menghapus data secara permanen, proses ini
+                    tidak dapat di pulihkan setelah di lakukan.
+
+                    <template v-slot:actions="{ isActive }">
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            :color="`${theme}-lighten-2`"
+                            class="text-white mr-2"
+                            variant="flat"
+                            @click="isActive.value = false"
+                            >batal</v-btn
+                        >
+
+                        <v-btn
+                            color="deep-orange"
+                            text="Hapus"
+                            @click="
+                                postFormForceDelete(
+                                    () => (isActive.value = false)
+                                )
+                            "
+                        ></v-btn>
+                    </template>
+                </form-confirm>
+            </v-btn>
         </template>
 
-        <template v-slot:helpdesk>
-            <slot name="helpdesk" :theme="theme"></slot>
+        <template v-else>
+            <v-btn v-if="!hideEdit" icon @click="openFormEdit">
+                <v-icon>edit</v-icon>
+
+                <v-tooltip activator="parent" location="bottom">Ubah</v-tooltip>
+            </v-btn>
+
+            <v-btn v-if="!hideDelete" color="deep-orange" icon>
+                <v-icon>delete</v-icon>
+
+                <form-confirm icon="delete" title="Hapus data ini?">
+                    Proses ini akan juga menghapus semua data yang terkait pada
+                    data ini.
+
+                    <template v-slot:actions="{ isActive }">
+                        <v-row dense>
+                            <v-col cols="6">
+                                <v-btn
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="outlined"
+                                    block
+                                    @click="isActive.value = false"
+                                    >BATAL</v-btn
+                                >
+                            </v-col>
+
+                            <v-col cols="6">
+                                <v-btn
+                                    :color="theme"
+                                    rounded="pill"
+                                    variant="flat"
+                                    block
+                                    @click="
+                                        postFormDelete(
+                                            () => (isActive.value = false)
+                                        )
+                                    "
+                                    >HAPUS</v-btn
+                                >
+                            </v-col>
+                        </v-row>
+                    </template>
+                </form-confirm>
+            </v-btn>
+        </template>
+        <div>
+            <slot
+                name="toolbar"
+                :record="record"
+                :theme="theme"
+                :statuses="statuses"
+                :store="store"
+            >
+            </slot>
+
+            <!-- <v-tooltip activator="parent" location="bottom">tess</v-tooltip> -->
+        </div>
+        <v-btn v-if="withHelpdesk" icon @click="helpState = !helpState">
+            <v-icon
+                :style="
+                    helpState
+                        ? 'transform: rotate(180deg)'
+                        : 'transform: rotate(0deg)'
+                "
+                >{{ helpState ? "close" : "menu_open" }}</v-icon
+            >
+
+            <v-tooltip activator="parent" location="bottom"
+                >Informasi</v-tooltip
+            >
+        </v-btn>
+    </v-app-bar>
+
+    <v-main style="min-height: 100dvh">
+        <v-container>
+            <page-paper :max-width="maxWidth">
+                <slot
+                    :combos="combos"
+                    :record="record"
+                    :theme="theme"
+                    :statuses="statuses"
+                    :store="store"
+                ></slot>
+            </page-paper>
+        </v-container>
+    </v-main>
+
+    <form-help mode="show" :withActivityLogs="withActivityLogs">
+        <template v-slot:feed>
+            <slot name="feed" :theme="theme"></slot>
+        </template>
+
+        <template v-slot:info>
+            <slot
+                name="info"
+                :combos="combos"
+                :record="record"
+                :statuses="statuses"
+                :theme="theme"
+                :store="store"
+            ></slot>
+        </template>
+
+        <template v-slot:icon>
+            <slot name="icon" :theme="theme"></slot>
         </template>
     </form-help>
 </template>
@@ -237,15 +201,8 @@ export default {
 
     props: {
         beforePost: Function,
-
-        blankForm: Boolean,
-
-        contentClass: String,
-
         dataFromStore: Boolean,
-
         hideEdit: Boolean,
-
         hideDelete: Boolean,
 
         maxWidth: {
@@ -253,14 +210,14 @@ export default {
             default: "560px",
         },
 
-        width: {
-            type: String,
-            default: "500px",
-        },
-
+        navbackTo: String,
+        withActivityLogs: Boolean,
         withHelpdesk: Boolean,
 
-        withActivityLogs: Boolean,
+        tooltip: {
+            type: String,
+            default: null,
+        },
     },
 
     setup(props) {
@@ -276,6 +233,7 @@ export default {
             key,
             page,
             pageKey,
+            statuses,
             softdelete,
             record,
             theme,
@@ -298,6 +256,7 @@ export default {
             page,
             pageKey,
             record,
+            statuses,
             softdelete,
             theme,
 
@@ -307,6 +266,8 @@ export default {
             postFormDelete,
             postFormForceDelete,
             postFormRestore,
+
+            store,
         };
     },
 
