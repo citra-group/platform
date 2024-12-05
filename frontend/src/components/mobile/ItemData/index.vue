@@ -157,13 +157,13 @@ export default {
     methods: {
         getChipColor(chip) {
             switch (chip) {
-                case "SELESAI":
+                case "BERHASIL":
                     return "green";
 
                 case "LUNAS":
                     return "green";
 
-                case "BERHASIL":
+                case "SUCCESS":
                     return "green";
 
                 case "BERJALAN":
