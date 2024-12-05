@@ -1,32 +1,11 @@
-<!-- <template>
-    <v-sheet
-        :class="vertical ? 'flex-column' : null"
-        color="grey-lighten-5"
-        class="d-flex align-center justify-center pa-3 border-thin"
-        rounded
-    >
-
-	
-        <slot></slot>
-    </v-sheet>
-</template>
-
-<script>
-export default {
-    name: "widget-card",
-
-    props: {
-        vertical: Boolean,
-    },
-};
-</script> -->
-
 <template>
-    <v-sheet :class="vertical ? 'flex-column' : null" rounded>
-        <v-toolbar density="compact">
-            <v-toolbar-title class="text-caption text-uppercase">{{
-                title
-            }}</v-toolbar-title>
+    <v-sheet :class="vertical ? 'flex-column' : null" rounded elevation="1">
+        <v-toolbar density="compact" style="overflow: visible !important">
+            <v-toolbar-title
+                class="text-caption text-uppercase v-toolbar-title__placeholder"
+                style="overflow: visible !important"
+                >{{ title }}</v-toolbar-title
+            >
 
             <v-spacer></v-spacer>
 
@@ -71,4 +50,10 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-toolbar-title__placeholder {
+    overflow: visible !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
