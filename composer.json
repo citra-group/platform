@@ -1,0 +1,29 @@
+{
+    "name": "citrapp/platform",
+    "description": "Citra Group Web Application Platform",
+    "type": "library",
+    "require": {
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/fortify": "^1.21",
+        "jenssegers/agent": "^2.6",
+        "kalnoy/nestedset": "^6.0",
+        "maatwebsite/excel": "^3.1",
+        "wikimedia/composer-merge-plugin": "^2.1"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Citrapp\\Platform\\": "src/"
+        }
+    },
+    "extra": {
+		"laravel": {
+			"providers": [
+				"Citrapp\\Platform\\ModularServiceProvider"
+			]
+		}
+	},
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
